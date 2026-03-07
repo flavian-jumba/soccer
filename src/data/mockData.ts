@@ -1,0 +1,603 @@
+/**
+ * Mock data for VistaScores sports prediction app
+ * Rich realistic data for Categories, Matches, and Won Games
+ */
+
+export type MatchStatus = "won" | "lost" | "pending";
+export type IconName =
+  | "Goal"
+  | "TrendingUp"
+  | "Target"
+  | "Trophy"
+  | "Zap"
+  | "Crown"
+  | "Star"
+  | "Flame"
+  | "Award"
+  | "Percent";
+
+export interface Category {
+  id: string;
+  title: string;
+  description: string;
+  icon: IconName;
+  isVip: boolean;
+  matchCount: number;
+  winRate: number;
+}
+
+export interface Match {
+  id: string;
+  categoryId: string;
+  league: string;
+  leagueIcon?: string;
+  homeTeam: string;
+  awayTeam: string;
+  prediction: string;
+  odds: string;
+  status: MatchStatus;
+  date: string;
+  time: string;
+  score?: string;
+}
+
+export interface WonPrediction {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  prediction: string;
+  odds: string;
+  score: string;
+  league: string;
+}
+
+// Free Categories
+export const freeCategories: Category[] = [
+  {
+    id: "btts",
+    title: "BTTS Tips",
+    description: "Both Teams to Score",
+    icon: "Goal",
+    isVip: false,
+    matchCount: 8,
+    winRate: 78,
+  },
+  {
+    id: "over25",
+    title: "Over 2.5",
+    description: "Over 2.5 Goals",
+    icon: "TrendingUp",
+    isVip: false,
+    matchCount: 12,
+    winRate: 82,
+  },
+  {
+    id: "1x2",
+    title: "1X2 Tips",
+    description: "Match Winner",
+    icon: "Target",
+    isVip: false,
+    matchCount: 15,
+    winRate: 71,
+  },
+  {
+    id: "draws",
+    title: "Draw Tips",
+    description: "Draw Predictions",
+    icon: "Percent",
+    isVip: false,
+    matchCount: 6,
+    winRate: 65,
+  },
+];
+
+// VIP Categories
+export const vipCategories: Category[] = [
+  {
+    id: "htft",
+    title: "HT/FT Tips",
+    description: "Halftime/Fulltime",
+    icon: "Trophy",
+    isVip: true,
+    matchCount: 5,
+    winRate: 89,
+  },
+  {
+    id: "combo",
+    title: "Combo Tips",
+    description: "Accumulator Bets",
+    icon: "Zap",
+    isVip: true,
+    matchCount: 3,
+    winRate: 85,
+  },
+  {
+    id: "megaodds",
+    title: "Mega Odds",
+    description: "High Value Tips",
+    icon: "Crown",
+    isVip: true,
+    matchCount: 4,
+    winRate: 76,
+  },
+  {
+    id: "correct",
+    title: "Correct Score",
+    description: "Exact Score Predictions",
+    icon: "Star",
+    isVip: true,
+    matchCount: 6,
+    winRate: 68,
+  },
+  {
+    id: "daily2",
+    title: "Daily 2 Odds",
+    description: "Sure 2 Odds Daily",
+    icon: "Flame",
+    isVip: true,
+    matchCount: 2,
+    winRate: 94,
+  },
+  {
+    id: "vipsingle",
+    title: "VIP Singles",
+    description: "Premium Single Tips",
+    icon: "Award",
+    isVip: true,
+    matchCount: 8,
+    winRate: 88,
+  },
+];
+
+// All matches organized by category
+export const matches: Match[] = [
+  // BTTS Matches
+  {
+    id: "m1",
+    categoryId: "btts",
+    league: "Premier League",
+    homeTeam: "Manchester United",
+    awayTeam: "Liverpool",
+    prediction: "BTTS - Yes",
+    odds: "1.72",
+    status: "won",
+    date: "2026-03-02",
+    time: "15:00",
+    score: "2-2",
+  },
+  {
+    id: "m2",
+    categoryId: "btts",
+    league: "La Liga",
+    homeTeam: "Real Madrid",
+    awayTeam: "Barcelona",
+    prediction: "BTTS - Yes",
+    odds: "1.65",
+    status: "won",
+    date: "2026-03-02",
+    time: "20:00",
+    score: "3-2",
+  },
+  {
+    id: "m3",
+    categoryId: "btts",
+    league: "Serie A",
+    homeTeam: "AC Milan",
+    awayTeam: "Inter Milan",
+    prediction: "BTTS - Yes",
+    odds: "1.80",
+    status: "pending",
+    date: "2026-03-03",
+    time: "18:45",
+  },
+  {
+    id: "m4",
+    categoryId: "btts",
+    league: "Bundesliga",
+    homeTeam: "Bayern Munich",
+    awayTeam: "Dortmund",
+    prediction: "BTTS - Yes",
+    odds: "1.55",
+    status: "lost",
+    date: "2026-03-01",
+    time: "17:30",
+    score: "3-0",
+  },
+
+  // Over 2.5 Matches
+  {
+    id: "m5",
+    categoryId: "over25",
+    league: "Premier League",
+    homeTeam: "Manchester City",
+    awayTeam: "Arsenal",
+    prediction: "Over 2.5",
+    odds: "1.75",
+    status: "won",
+    date: "2026-03-02",
+    time: "16:30",
+    score: "2-2",
+  },
+  {
+    id: "m6",
+    categoryId: "over25",
+    league: "Ligue 1",
+    homeTeam: "PSG",
+    awayTeam: "Lyon",
+    prediction: "Over 2.5",
+    odds: "1.60",
+    status: "won",
+    date: "2026-03-02",
+    time: "21:00",
+    score: "4-1",
+  },
+  {
+    id: "m7",
+    categoryId: "over25",
+    league: "Champions League",
+    homeTeam: "Chelsea",
+    awayTeam: "Juventus",
+    prediction: "Over 2.5",
+    odds: "1.90",
+    status: "pending",
+    date: "2026-03-03",
+    time: "20:00",
+  },
+  {
+    id: "m8",
+    categoryId: "over25",
+    league: "Europa League",
+    homeTeam: "Sevilla",
+    awayTeam: "Roma",
+    prediction: "Over 2.5",
+    odds: "1.85",
+    status: "pending",
+    date: "2026-03-03",
+    time: "18:00",
+  },
+
+  // 1X2 Matches
+  {
+    id: "m9",
+    categoryId: "1x2",
+    league: "Premier League",
+    homeTeam: "Tottenham",
+    awayTeam: "Newcastle",
+    prediction: "Home Win (1)",
+    odds: "2.10",
+    status: "won",
+    date: "2026-03-02",
+    time: "14:00",
+    score: "2-1",
+  },
+  {
+    id: "m10",
+    categoryId: "1x2",
+    league: "La Liga",
+    homeTeam: "Atletico Madrid",
+    awayTeam: "Villarreal",
+    prediction: "Home Win (1)",
+    odds: "1.85",
+    status: "pending",
+    date: "2026-03-03",
+    time: "19:00",
+  },
+  {
+    id: "m11",
+    categoryId: "1x2",
+    league: "Bundesliga",
+    homeTeam: "Leverkusen",
+    awayTeam: "Leipzig",
+    prediction: "Away Win (2)",
+    odds: "2.40",
+    status: "lost",
+    date: "2026-03-01",
+    time: "15:30",
+    score: "2-0",
+  },
+  {
+    id: "m12",
+    categoryId: "1x2",
+    league: "Serie A",
+    homeTeam: "Napoli",
+    awayTeam: "Lazio",
+    prediction: "Home Win (1)",
+    odds: "1.95",
+    status: "won",
+    date: "2026-03-02",
+    time: "17:00",
+    score: "3-1",
+  },
+
+  // Draw Tips
+  {
+    id: "m13",
+    categoryId: "draws",
+    league: "Premier League",
+    homeTeam: "Brighton",
+    awayTeam: "Aston Villa",
+    prediction: "Draw (X)",
+    odds: "3.40",
+    status: "won",
+    date: "2026-03-02",
+    time: "15:00",
+    score: "1-1",
+  },
+  {
+    id: "m14",
+    categoryId: "draws",
+    league: "La Liga",
+    homeTeam: "Real Sociedad",
+    awayTeam: "Athletic Bilbao",
+    prediction: "Draw (X)",
+    odds: "3.20",
+    status: "pending",
+    date: "2026-03-03",
+    time: "21:00",
+  },
+
+  // VIP - HT/FT
+  {
+    id: "m15",
+    categoryId: "htft",
+    league: "Premier League",
+    homeTeam: "Arsenal",
+    awayTeam: "West Ham",
+    prediction: "1/1",
+    odds: "2.20",
+    status: "won",
+    date: "2026-03-02",
+    time: "15:00",
+    score: "3-0",
+  },
+  {
+    id: "m16",
+    categoryId: "htft",
+    league: "Champions League",
+    homeTeam: "Real Madrid",
+    awayTeam: "Man City",
+    prediction: "1/1",
+    odds: "2.80",
+    status: "pending",
+    date: "2026-03-03",
+    time: "21:00",
+  },
+
+  // VIP - Combo
+  {
+    id: "m17",
+    categoryId: "combo",
+    league: "Combo",
+    homeTeam: "5-Fold Accumulator",
+    awayTeam: "Mixed Leagues",
+    prediction: "All Wins",
+    odds: "12.50",
+    status: "won",
+    date: "2026-03-02",
+    time: "Various",
+    score: "5/5 ✓",
+  },
+  {
+    id: "m18",
+    categoryId: "combo",
+    league: "Combo",
+    homeTeam: "3-Fold BTTS",
+    awayTeam: "Top Leagues",
+    prediction: "All BTTS",
+    odds: "4.80",
+    status: "pending",
+    date: "2026-03-03",
+    time: "Various",
+  },
+
+  // VIP - Mega Odds
+  {
+    id: "m19",
+    categoryId: "megaodds",
+    league: "Championship",
+    homeTeam: "Leeds United",
+    awayTeam: "Leicester",
+    prediction: "Correct Score 2-1",
+    odds: "8.50",
+    status: "won",
+    date: "2026-03-02",
+    time: "12:30",
+    score: "2-1",
+  },
+  {
+    id: "m20",
+    categoryId: "megaodds",
+    league: "Serie A",
+    homeTeam: "Roma",
+    awayTeam: "Fiorentina",
+    prediction: "HT/FT Draw/Away",
+    odds: "15.00",
+    status: "pending",
+    date: "2026-03-03",
+    time: "20:45",
+  },
+
+  // VIP - Correct Score
+  {
+    id: "m21",
+    categoryId: "correct",
+    league: "Premier League",
+    homeTeam: "Wolves",
+    awayTeam: "Crystal Palace",
+    prediction: "1-1",
+    odds: "6.50",
+    status: "won",
+    date: "2026-03-02",
+    time: "15:00",
+    score: "1-1",
+  },
+  {
+    id: "m22",
+    categoryId: "correct",
+    league: "La Liga",
+    homeTeam: "Valencia",
+    awayTeam: "Getafe",
+    prediction: "2-0",
+    odds: "7.00",
+    status: "pending",
+    date: "2026-03-03",
+    time: "18:30",
+  },
+
+  // VIP - Daily 2 Odds
+  {
+    id: "m23",
+    categoryId: "daily2",
+    league: "Multiple",
+    homeTeam: "Daily Sure Bet",
+    awayTeam: "2 Odds Target",
+    prediction: "Accumulator",
+    odds: "2.05",
+    status: "won",
+    date: "2026-03-02",
+    time: "20:00",
+    score: "✓ Won",
+  },
+
+  // VIP Singles
+  {
+    id: "m24",
+    categoryId: "vipsingle",
+    league: "Serie A",
+    homeTeam: "Juventus",
+    awayTeam: "Atalanta",
+    prediction: "Under 3.5",
+    odds: "1.45",
+    status: "won",
+    date: "2026-03-02",
+    time: "20:45",
+    score: "1-0",
+  },
+  {
+    id: "m25",
+    categoryId: "vipsingle",
+    league: "Bundesliga",
+    homeTeam: "Frankfurt",
+    awayTeam: "Wolfsburg",
+    prediction: "Home or Draw",
+    odds: "1.30",
+    status: "pending",
+    date: "2026-03-03",
+    time: "17:30",
+  },
+];
+
+// Recent winning predictions for the marquee
+export const wonPredictions: WonPrediction[] = [
+  {
+    id: "w1",
+    homeTeam: "Man United",
+    awayTeam: "Liverpool",
+    prediction: "BTTS Yes",
+    odds: "1.72",
+    score: "2-2",
+    league: "EPL",
+  },
+  {
+    id: "w2",
+    homeTeam: "Real Madrid",
+    awayTeam: "Barcelona",
+    prediction: "BTTS Yes",
+    odds: "1.65",
+    score: "3-2",
+    league: "La Liga",
+  },
+  {
+    id: "w3",
+    homeTeam: "PSG",
+    awayTeam: "Lyon",
+    prediction: "Over 2.5",
+    odds: "1.60",
+    score: "4-1",
+    league: "Ligue 1",
+  },
+  {
+    id: "w4",
+    homeTeam: "Arsenal",
+    awayTeam: "West Ham",
+    prediction: "HT/FT 1/1",
+    odds: "2.20",
+    score: "3-0",
+    league: "EPL",
+  },
+  {
+    id: "w5",
+    homeTeam: "Leeds",
+    awayTeam: "Leicester",
+    prediction: "CS 2-1",
+    odds: "8.50",
+    score: "2-1",
+    league: "Championship",
+  },
+  {
+    id: "w6",
+    homeTeam: "Napoli",
+    awayTeam: "Lazio",
+    prediction: "Home Win",
+    odds: "1.95",
+    score: "3-1",
+    league: "Serie A",
+  },
+  {
+    id: "w7",
+    homeTeam: "Brighton",
+    awayTeam: "Aston Villa",
+    prediction: "Draw",
+    odds: "3.40",
+    score: "1-1",
+    league: "EPL",
+  },
+  {
+    id: "w8",
+    homeTeam: "5-Fold Combo",
+    awayTeam: "Accumulator",
+    prediction: "All Wins",
+    odds: "12.50",
+    score: "5/5 ✓",
+    league: "Mixed",
+  },
+  {
+    id: "w9",
+    homeTeam: "Wolves",
+    awayTeam: "Crystal Palace",
+    prediction: "CS 1-1",
+    odds: "6.50",
+    score: "1-1",
+    league: "EPL",
+  },
+  {
+    id: "w10",
+    homeTeam: "Juventus",
+    awayTeam: "Atalanta",
+    prediction: "Under 3.5",
+    odds: "1.45",
+    score: "1-0",
+    league: "Serie A",
+  },
+];
+
+// Helper functions
+export function getMatchesByCategory(categoryId: string): Match[] {
+  return matches.filter((match) => match.categoryId === categoryId);
+}
+
+export function getCategoryById(categoryId: string): Category | undefined {
+  return [...freeCategories, ...vipCategories].find(
+    (cat) => cat.id === categoryId,
+  );
+}
+
+export function getWonMatchesCount(): number {
+  return matches.filter((m) => m.status === "won").length;
+}
+
+export function getTotalWinRate(): number {
+  const decided = matches.filter((m) => m.status !== "pending");
+  const won = decided.filter((m) => m.status === "won");
+  return Math.round((won.length / decided.length) * 100);
+}

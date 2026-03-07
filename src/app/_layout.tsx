@@ -1,16 +1,46 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import React from 'react';
-import { useColorScheme } from 'react-native';
+import "../global.css";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { PremiumColors } from "@/constants/colors";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// Custom dark theme for premium look
+const PremiumDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: PremiumColors.background.primary,
+    card: PremiumColors.background.secondary,
+    border: PremiumColors.glass.border,
+    text: PremiumColors.text.primary,
+    primary: PremiumColors.accent.primary,
+  },
+};
+
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={PremiumDarkTheme}>
+        <BottomSheetModalProvider>
+          <StatusBar style="light" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: {
+                backgroundColor: PremiumColors.background.primary,
+              },
+              animation: "fade",
+            }}
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen name="home" />
+          </Stack>
+        </BottomSheetModalProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
