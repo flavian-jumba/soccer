@@ -1,5 +1,5 @@
 import { PremiumColors } from "@/constants/colors";
-import { Bell, Info, Sparkles } from "lucide-react-native";
+import { Bell, Info } from "lucide-react-native";
 import React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,24 +9,25 @@ interface HeaderProps {
   title?: string;
   showNotification?: boolean;
   onInfoPress?: () => void;
+  onNotificationPress?: () => void;
+  unreadCount?: number;
 }
 
 export function Header({
-  title = "VistaScores",
   showNotification = true,
   onInfoPress,
+  onNotificationPress,
+  unreadCount = 0,
 }: HeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
       <View style={styles.content}>
-        {/* Logo & Title */}
+        {/* Text Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoIcon}>
-            <Sparkles size={20} color={PremiumColors.accent.primary} />
-          </View>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.logoTitan}>Titan </Text>
+          <Text style={styles.logoRest}>Football Tips</Text>
         </View>
 
         {/* Actions */}
@@ -39,10 +40,23 @@ export function Header({
             </AnimatedPressableButton>
           )}
           {showNotification && (
-            <AnimatedPressableButton onPress={() => {}}>
+            <AnimatedPressableButton onPress={onNotificationPress}>
               <View style={styles.iconButton}>
-                <Bell size={20} color={PremiumColors.text.secondary} />
-                <View style={styles.notificationBadge} />
+                <Bell
+                  size={20}
+                  color={
+                    unreadCount > 0
+                      ? PremiumColors.text.primary
+                      : PremiumColors.text.secondary
+                  }
+                />
+                {unreadCount > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.notificationBadgeText}>
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </Text>
+                  </View>
+                )}
               </View>
             </AnimatedPressableButton>
           )}
@@ -76,25 +90,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingLeft: 8,
+    paddingRight: 20,
     paddingBottom: 12,
   },
   logoContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    alignItems: "baseline",
   },
-  logoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: "rgba(59, 130, 246, 0.15)",
-    justifyContent: "center",
-    alignItems: "center",
+  logoTitan: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: PremiumColors.gold.primary,
+    letterSpacing: -0.5,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
+  logoRest: {
+    fontSize: 24,
+    fontWeight: "900",
     color: PremiumColors.text.primary,
     letterSpacing: -0.5,
   },
@@ -116,12 +128,23 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: 4,
+    right: 4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: PremiumColors.status.lost,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: PremiumColors.background.primary,
+  },
+  notificationBadgeText: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: PremiumColors.text.primary,
+    lineHeight: 11,
   },
 });
 

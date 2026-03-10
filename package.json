@@ -5,13 +5,14 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "seed": "node ./scripts/seed-firestore.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo/ngrok": "^4.0.0",
+    "@expo/ngrok": "^4.1.0",
     "@gorhom/bottom-sheet": "^5",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.7.3",
@@ -30,6 +31,7 @@
     "expo-symbols": "~55.0.4",
     "expo-system-ui": "~55.0.9",
     "expo-web-browser": "~55.0.9",
+    "firebase": "^12.10.0",
     "lucide-react-native": "^0.576.0",
     "nativewind": "^4.2.2",
     "react": "19.2.0",
@@ -46,6 +48,7 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "@types/react-native": "^0.72.8",
+    "firebase-admin": "^13.7.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2"
   },

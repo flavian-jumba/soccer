@@ -1,57 +1,67 @@
 import LegalInfoSheet from "@/components/legal-info-sheet";
 import MatchDetailSheet from "@/components/match-detail-sheet";
+import NotificationsSheet from "@/components/notifications-sheet";
 import { CategoryCard } from "@/components/ui/category-card";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Header } from "@/components/ui/header";
 import { WinningMarquee } from "@/components/ui/winning-marquee";
 import VipPromptSheet from "@/components/vip-prompt-sheet";
 import { PremiumColors } from "@/constants/colors";
-import {
-    freeCategories,
-    getMatchesByCategory,
-    getTotalWinRate,
-    getWonMatchesCount,
-    vipCategories,
-    wonPredictions,
-    type Category,
-    type Match,
-} from "@/data/mockData";
+import type { Category } from "@/data/mockData";
+import { useFreeTips, useVipTips } from "@/hooks/use-categories";
+import { useMatchesByCategory, useMatchStats } from "@/hooks/use-matches";
+import { useNotifications } from "@/hooks/use-notifications";
+import { useWonPredictions } from "@/hooks/use-won-predictions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Crown, TrendingUp, Zap } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+    ActivityIndicator,
+    FlatList,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
-  // Bottom sheet refs
-  const matchDetailRef = useRef<BottomSheetModal>(null);
-  const vipPromptRef = useRef<BottomSheetModal>(null);
-  const legalInfoRef = useRef<BottomSheetModal>(null);
+  // ── Firestore data ──────────────────────────────────────────────────────────
+  const { categories: freeCategories, loading: freeCatsLoading } =
+    useFreeTips();
+  const { categories: vipCategories, loading: vipCatsLoading } = useVipTips();
+  const { predictions: wonPredictions, loading: wonLoading } =
+    useWonPredictions();
+  const { wonCount, winRate } = useMatchStats();
+  const { notifications, unreadCount, markAllRead } = useNotifications();
 
-  // State for selected category
+  // ── Selected category for the match detail sheet ────────────────────────────
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
-  const [selectedMatches, setSelectedMatches] = useState<Match[]>([]);
+  const { matches: selectedMatches } = useMatchesByCategory(
+    selectedCategory?.id ?? null,
+  );
+
+  // ── Bottom sheet refs ───────────────────────────────────────────────────────
+  const matchDetailRef = useRef<BottomSheetModal>(null);
+  const vipPromptRef = useRef<BottomSheetModal>(null);
+  const legalInfoRef = useRef<BottomSheetModal>(null);
+  const notificationsRef = useRef<BottomSheetModal>(null);
 
   const handleCategoryPress = useCallback((category: Category) => {
     if (category.isVip) {
-      // Show VIP prompt for VIP categories
       vipPromptRef.current?.present();
     } else {
-      // Show match details for free categories
-      const matches = getMatchesByCategory(category.id);
       setSelectedCategory(category);
-      setSelectedMatches(matches);
       matchDetailRef.current?.present();
     }
   }, []);
 
   const handleVipSubscribe = useCallback(() => {
-    // Handle subscription - in real app would open payment flow
     vipPromptRef.current?.dismiss();
   }, []);
 
@@ -59,13 +69,19 @@ export default function HomeScreen() {
     legalInfoRef.current?.present();
   }, []);
 
-  const winRate = getTotalWinRate();
-  const wonCount = getWonMatchesCount();
+  const handleNotificationPress = useCallback(() => {
+    notificationsRef.current?.present();
+    markAllRead();
+  }, [markAllRead]);
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {/* Sticky Header */}
-      <Header title="VistaScores" onInfoPress={handleInfoPress} />
+      <Header
+        onInfoPress={handleInfoPress}
+        onNotificationPress={handleNotificationPress}
+        unreadCount={unreadCount}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -127,21 +143,29 @@ export default function HomeScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInRight.delay(300).springify()}>
-          <FlatList
-            data={freeCategories}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.categoryList}
-            renderItem={({ item, index }) => (
-              <Animated.View entering={FadeInRight.delay(300 + index * 100)}>
-                <CategoryCard
-                  category={item}
-                  onPress={() => handleCategoryPress(item)}
-                />
-              </Animated.View>
-            )}
-          />
+          {freeCatsLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={PremiumColors.accent.primary}
+              style={styles.loader}
+            />
+          ) : (
+            <FlatList
+              data={freeCategories}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.categoryList}
+              renderItem={({ item, index }) => (
+                <Animated.View entering={FadeInRight.delay(300 + index * 100)}>
+                  <CategoryCard
+                    category={item}
+                    onPress={() => handleCategoryPress(item)}
+                  />
+                </Animated.View>
+              )}
+            />
+          )}
         </Animated.View>
 
         {/* VIP Tips Section */}
@@ -163,21 +187,29 @@ export default function HomeScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInRight.delay(500).springify()}>
-          <FlatList
-            data={vipCategories}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.categoryList}
-            renderItem={({ item, index }) => (
-              <Animated.View entering={FadeInRight.delay(500 + index * 100)}>
-                <CategoryCard
-                  category={item}
-                  onPress={() => handleCategoryPress(item)}
-                />
-              </Animated.View>
-            )}
-          />
+          {vipCatsLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={PremiumColors.gold.primary}
+              style={styles.loader}
+            />
+          ) : (
+            <FlatList
+              data={vipCategories}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.categoryList}
+              renderItem={({ item, index }) => (
+                <Animated.View entering={FadeInRight.delay(500 + index * 100)}>
+                  <CategoryCard
+                    category={item}
+                    onPress={() => handleCategoryPress(item)}
+                  />
+                </Animated.View>
+              )}
+            />
+          )}
         </Animated.View>
 
         {/* Recently Won Section */}
@@ -186,16 +218,25 @@ export default function HomeScreen() {
             <View style={styles.sectionTitleRow}>
               <View style={styles.wonIndicator} />
               <Text style={styles.sectionTitle}>Recently Won</Text>
+              <Crown size={16} color={PremiumColors.gold.primary} />
             </View>
             <Text style={styles.sectionSubtitle}>
-              Latest winning predictions
+              Latest winning predictions · Gold = VIP
             </Text>
           </View>
         </Animated.View>
 
         {/* Winning Marquee */}
         <Animated.View entering={FadeInDown.delay(700).springify()}>
-          <WinningMarquee predictions={wonPredictions} />
+          {wonLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={PremiumColors.status.won}
+              style={styles.loader}
+            />
+          ) : (
+            <WinningMarquee predictions={wonPredictions} />
+          )}
         </Animated.View>
 
         {/* Bottom Spacing */}
@@ -212,6 +253,12 @@ export default function HomeScreen() {
       <VipPromptSheet ref={vipPromptRef} onSubscribe={handleVipSubscribe} />
 
       <LegalInfoSheet ref={legalInfoRef} />
+
+      <NotificationsSheet
+        ref={notificationsRef}
+        notifications={notifications}
+        onMarkAllRead={markAllRead}
+      />
     </View>
   );
 }
@@ -319,6 +366,9 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: PremiumColors.status.won,
+  },
+  loader: {
+    marginVertical: 24,
   },
   bottomSpacer: {
     height: 40,

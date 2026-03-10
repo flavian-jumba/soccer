@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "vistascores2",
-    "slug": "vistascores2",
+    "name": "Titan Scores",
+    "slug": "Titan Scores",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "vistascores2",
+    "scheme": "TitanScores",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
@@ -22,14 +22,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#1d293d",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76

@@ -1,59 +1,42 @@
 /**
- * Mock data for VistaScores sports prediction app
- * Rich realistic data for Categories, Matches, and Won Games
+ * Firestore Seed Script — Titan Football Tips
+ *
+ * SETUP BEFORE RUNNING:
+ *  1. Go to Firebase Console → Project Settings → Service Accounts
+ *  2. Click "Generate new private key" → save as serviceAccountKey.json
+ *     in the ROOT of this project (next to package.json)
+ *  3. Run:  npm run seed
+ *
+ * WARNING: serviceAccountKey.json is already in .gitignore — never commit it.
  */
 
-export type MatchStatus = "won" | "lost" | "pending";
-export type IconName =
-  | "Goal"
-  | "TrendingUp"
-  | "Target"
-  | "Trophy"
-  | "Zap"
-  | "Crown"
-  | "Star"
-  | "Flame"
-  | "Award"
-  | "Percent";
+const admin = require("firebase-admin");
+const path = require("path");
+const fs = require("fs");
 
-export interface Category {
-  id: string;
-  title: string;
-  description: string;
-  icon: IconName;
-  isVip: boolean;
-  matchCount: number;
-  winRate: number;
+// ─── Load service account ────────────────────────────────────────────────────
+const keyPath = path.join(__dirname, "../serviceAccountKey.json");
+
+if (!fs.existsSync(keyPath)) {
+  console.error("\n❌  serviceAccountKey.json not found.");
+  console.error(
+    "    Download it from Firebase Console → Project Settings → Service Accounts\n",
+  );
+  process.exit(1);
 }
 
-export interface Match {
-  id: string;
-  categoryId: string;
-  league: string;
-  leagueIcon?: string;
-  homeTeam: string;
-  awayTeam: string;
-  prediction: string;
-  odds: string;
-  status: MatchStatus;
-  date: string;
-  time: string;
-  score?: string;
-}
+const serviceAccount = require(keyPath);
 
-export interface WonPrediction {
-  id: string;
-  homeTeam: string;
-  awayTeam: string;
-  prediction: string;
-  odds: string;
-  score: string;
-  league: string;
-  isVip?: boolean;
-}
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-// Free Categories
-export const freeCategories: Category[] = [
+const db = admin.firestore();
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const categories = [
+  // Free
   {
     id: "btts",
     title: "BTTS Tips",
@@ -62,6 +45,7 @@ export const freeCategories: Category[] = [
     isVip: false,
     matchCount: 8,
     winRate: 78,
+    order: 1,
   },
   {
     id: "over25",
@@ -71,6 +55,7 @@ export const freeCategories: Category[] = [
     isVip: false,
     matchCount: 12,
     winRate: 82,
+    order: 2,
   },
   {
     id: "1x2",
@@ -80,6 +65,7 @@ export const freeCategories: Category[] = [
     isVip: false,
     matchCount: 15,
     winRate: 71,
+    order: 3,
   },
   {
     id: "draws",
@@ -89,11 +75,9 @@ export const freeCategories: Category[] = [
     isVip: false,
     matchCount: 6,
     winRate: 65,
+    order: 4,
   },
-];
-
-// VIP Categories
-export const vipCategories: Category[] = [
+  // VIP
   {
     id: "htft",
     title: "HT/FT Tips",
@@ -102,6 +86,7 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 5,
     winRate: 89,
+    order: 1,
   },
   {
     id: "combo",
@@ -111,6 +96,7 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 3,
     winRate: 85,
+    order: 2,
   },
   {
     id: "megaodds",
@@ -120,6 +106,7 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 4,
     winRate: 76,
+    order: 3,
   },
   {
     id: "correct",
@@ -129,6 +116,7 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 6,
     winRate: 68,
+    order: 4,
   },
   {
     id: "daily2",
@@ -138,6 +126,7 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 2,
     winRate: 94,
+    order: 5,
   },
   {
     id: "vipsingle",
@@ -147,12 +136,12 @@ export const vipCategories: Category[] = [
     isVip: true,
     matchCount: 8,
     winRate: 88,
+    order: 6,
   },
 ];
 
-// All matches organized by category
-export const matches: Match[] = [
-  // BTTS Matches
+const matches = [
+  // BTTS
   {
     id: "m1",
     categoryId: "btts",
@@ -188,7 +177,7 @@ export const matches: Match[] = [
     prediction: "BTTS - Yes",
     odds: "1.80",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "18:45",
   },
   {
@@ -204,8 +193,7 @@ export const matches: Match[] = [
     time: "17:30",
     score: "3-0",
   },
-
-  // Over 2.5 Matches
+  // Over 2.5
   {
     id: "m5",
     categoryId: "over25",
@@ -241,7 +229,7 @@ export const matches: Match[] = [
     prediction: "Over 2.5",
     odds: "1.90",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "20:00",
   },
   {
@@ -253,11 +241,10 @@ export const matches: Match[] = [
     prediction: "Over 2.5",
     odds: "1.85",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "18:00",
   },
-
-  // 1X2 Matches
+  // 1X2
   {
     id: "m9",
     categoryId: "1x2",
@@ -280,7 +267,7 @@ export const matches: Match[] = [
     prediction: "Home Win (1)",
     odds: "1.85",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "19:00",
   },
   {
@@ -309,8 +296,7 @@ export const matches: Match[] = [
     time: "17:00",
     score: "3-1",
   },
-
-  // Draw Tips
+  // Draws
   {
     id: "m13",
     categoryId: "draws",
@@ -333,10 +319,9 @@ export const matches: Match[] = [
     prediction: "Draw (X)",
     odds: "3.20",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "21:00",
   },
-
   // VIP - HT/FT
   {
     id: "m15",
@@ -360,10 +345,9 @@ export const matches: Match[] = [
     prediction: "1/1",
     odds: "2.80",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "21:00",
   },
-
   // VIP - Combo
   {
     id: "m17",
@@ -387,10 +371,9 @@ export const matches: Match[] = [
     prediction: "All BTTS",
     odds: "4.80",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "Various",
   },
-
   // VIP - Mega Odds
   {
     id: "m19",
@@ -414,10 +397,9 @@ export const matches: Match[] = [
     prediction: "HT/FT Draw/Away",
     odds: "15.00",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "20:45",
   },
-
   // VIP - Correct Score
   {
     id: "m21",
@@ -441,10 +423,9 @@ export const matches: Match[] = [
     prediction: "2-0",
     odds: "7.00",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "18:30",
   },
-
   // VIP - Daily 2 Odds
   {
     id: "m23",
@@ -459,7 +440,6 @@ export const matches: Match[] = [
     time: "20:00",
     score: "✓ Won",
   },
-
   // VIP Singles
   {
     id: "m24",
@@ -483,13 +463,12 @@ export const matches: Match[] = [
     prediction: "Home or Draw",
     odds: "1.30",
     status: "pending",
-    date: "2026-03-03",
+    date: "2026-03-10",
     time: "17:30",
   },
 ];
 
-// Recent winning predictions for the marquee
-export const wonPredictions: WonPrediction[] = [
+const wonPredictions = [
   {
     id: "w1",
     homeTeam: "Man United",
@@ -498,6 +477,8 @@ export const wonPredictions: WonPrediction[] = [
     odds: "1.72",
     score: "2-2",
     league: "EPL",
+    isVip: false,
+    wonAt: new Date("2026-03-02T15:00:00Z"),
   },
   {
     id: "w2",
@@ -507,6 +488,8 @@ export const wonPredictions: WonPrediction[] = [
     odds: "1.65",
     score: "3-2",
     league: "La Liga",
+    isVip: false,
+    wonAt: new Date("2026-03-02T20:00:00Z"),
   },
   {
     id: "w3",
@@ -516,6 +499,8 @@ export const wonPredictions: WonPrediction[] = [
     odds: "1.60",
     score: "4-1",
     league: "Ligue 1",
+    isVip: false,
+    wonAt: new Date("2026-03-02T21:00:00Z"),
   },
   {
     id: "w4",
@@ -526,6 +511,7 @@ export const wonPredictions: WonPrediction[] = [
     score: "3-0",
     league: "EPL",
     isVip: true,
+    wonAt: new Date("2026-03-02T15:00:00Z"),
   },
   {
     id: "w5",
@@ -536,6 +522,7 @@ export const wonPredictions: WonPrediction[] = [
     score: "2-1",
     league: "Championship",
     isVip: true,
+    wonAt: new Date("2026-03-02T12:30:00Z"),
   },
   {
     id: "w6",
@@ -545,6 +532,8 @@ export const wonPredictions: WonPrediction[] = [
     odds: "1.95",
     score: "3-1",
     league: "Serie A",
+    isVip: false,
+    wonAt: new Date("2026-03-02T17:00:00Z"),
   },
   {
     id: "w7",
@@ -554,6 +543,8 @@ export const wonPredictions: WonPrediction[] = [
     odds: "3.40",
     score: "1-1",
     league: "EPL",
+    isVip: false,
+    wonAt: new Date("2026-03-02T15:00:00Z"),
   },
   {
     id: "w8",
@@ -564,6 +555,7 @@ export const wonPredictions: WonPrediction[] = [
     score: "5/5 ✓",
     league: "Mixed",
     isVip: true,
+    wonAt: new Date("2026-03-02T20:00:00Z"),
   },
   {
     id: "w9",
@@ -574,6 +566,7 @@ export const wonPredictions: WonPrediction[] = [
     score: "1-1",
     league: "EPL",
     isVip: true,
+    wonAt: new Date("2026-03-02T15:00:00Z"),
   },
   {
     id: "w10",
@@ -583,26 +576,48 @@ export const wonPredictions: WonPrediction[] = [
     odds: "1.45",
     score: "1-0",
     league: "Serie A",
+    isVip: false,
+    wonAt: new Date("2026-03-02T20:45:00Z"),
   },
 ];
 
-// Helper functions
-export function getMatchesByCategory(categoryId: string): Match[] {
-  return matches.filter((match) => match.categoryId === categoryId);
+// ─── Seeder ──────────────────────────────────────────────────────────────────
+
+async function seedCollection(collectionName, data) {
+  const col = db.collection(collectionName);
+  let count = 0;
+  for (const item of data) {
+    const { id, ...fields } = item;
+    await col.doc(id).set(fields);
+    console.log(`  ✅  ${collectionName}/${id}`);
+    count++;
+  }
+  return count;
 }
 
-export function getCategoryById(categoryId: string): Category | undefined {
-  return [...freeCategories, ...vipCategories].find(
-    (cat) => cat.id === categoryId,
-  );
+async function main() {
+  console.log("\n🔥  Seeding Firestore — Titan Football Tips\n");
+
+  try {
+    console.log("📁  categories");
+    const catCount = await seedCollection("categories", categories);
+
+    console.log("\n📁  matches");
+    const matchCount = await seedCollection("matches", matches);
+
+    console.log("\n📁  wonPredictions");
+    const wonCount = await seedCollection("wonPredictions", wonPredictions);
+
+    console.log(`\n✨  Done! Seeded:`);
+    console.log(`    • ${catCount} categories`);
+    console.log(`    • ${matchCount} matches`);
+    console.log(`    • ${wonCount} wonPredictions\n`);
+  } catch (err) {
+    console.error("\n❌  Seed failed:", err.message, "\n");
+    process.exit(1);
+  }
+
+  process.exit(0);
 }
 
-export function getWonMatchesCount(): number {
-  return matches.filter((m) => m.status === "won").length;
-}
-
-export function getTotalWinRate(): number {
-  const decided = matches.filter((m) => m.status !== "pending");
-  const won = decided.filter((m) => m.status === "won");
-  return Math.round((won.length / decided.length) * 100);
-}
+main();
