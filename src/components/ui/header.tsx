@@ -26,8 +26,8 @@ export function Header({
       <View style={styles.content}>
         {/* Text Logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoTitan}>Titan </Text>
-          <Text style={styles.logoRest}>Football Tips</Text>
+          <Text style={styles.logoTitan}>Titan</Text>
+          <Text style={styles.logoRest}>Tips</Text>
         </View>
 
         {/* Actions */}
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     minWidth: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: PremiumColors.status.lost,
+    backgroundColor: PremiumColors.gold.primary,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 3,

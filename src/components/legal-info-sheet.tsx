@@ -1,27 +1,30 @@
 import { PremiumColors } from "@/constants/colors";
 import {
-    BottomSheetBackdrop,
-    BottomSheetBackdropProps,
-    BottomSheetModal,
-    BottomSheetScrollView,
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import {
-    AlertTriangle,
-    ChevronDown,
-    FileText,
-    HelpCircle,
-    Lock,
-    Shield,
+  AlertTriangle,
+  ChevronDown,
+  FileText,
+  HelpCircle,
+  Lock,
+  Shield,
 } from "lucide-react-native";
 import React, { forwardRef, useCallback, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 
-interface LegalInfoSheetProps {}
+interface LegalInfoSheetProps {
+  /** Reserved for future controlled-sheet options. */
+  readonly presentationId?: never;
+}
 
 interface CollapsibleSectionProps {
   title: string;
@@ -116,7 +119,7 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
           >
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>For Entertainment Only:</Text>{" "}
-              VistaScores provides sports predictions for entertainment purposes
+              TitanTips provides sports predictions for entertainment purposes
               only. We do not guarantee any winnings or outcomes.
             </Text>
             <Text style={styles.contentText}>
@@ -134,6 +137,12 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
               prediction results do not guarantee future outcomes. Sports events
               are inherently unpredictable.
             </Text>
+            <Text style={styles.contentText}>
+              <Text style={styles.boldText}>Responsible Gambling:</Text> If you
+              or someone you know has a gambling problem, please seek help.
+              Visit begambleaware.org for information and support. Only gamble
+              with money you can afford to lose.
+            </Text>
           </CollapsibleSection>
 
           {/* FAQs */}
@@ -149,27 +158,42 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
               </Text>
               <Text style={styles.contentText}>
                 Our predictions are based on statistical analysis, team form,
-                and expert insights. While we maintain a high accuracy rate, no
-                prediction is guaranteed.
+                and expert insights. However, no prediction is guaranteed —
+                sports events are inherently unpredictable.
               </Text>
             </View>
             <View style={styles.faqItem}>
               <Text style={styles.faqQuestion}>
-                What is included in VIP membership?
+                What is included in a VIP subscription?
               </Text>
               <Text style={styles.contentText}>
-                VIP members get access to premium tips including HT/FT, Correct
-                Score, Combo Tips, Mega Odds, and priority customer support.
+                Each plan unlocks one prediction market and only that market —
+                subscribing to one does not unlock any other. You can subscribe
+                to as many markets as you like, weekly or monthly, and each is
+                billed and cancelled on its own. Free tips stay free for
+                everyone. The exact price, billing period and any trial are
+                shown on the VIP market popup before you subscribe.
               </Text>
             </View>
             <View style={styles.faqItem}>
               <Text style={styles.faqQuestion}>
-                How do I cancel my subscription?
+                How do I cancel or get a refund?
               </Text>
               <Text style={styles.contentText}>
-                You can cancel anytime through your app store subscription
-                settings. Your access continues until the end of the billing
-                period.
+                Subscriptions are billed by Google Play and renew automatically
+                until cancelled. Cancel any time in Google Play &rsaquo;
+                Subscriptions — you keep access until the current period ends.
+                Refunds follow Google Play&apos;s refund policy.
+              </Text>
+            </View>
+            <View style={styles.faqItem}>
+              <Text style={styles.faqQuestion}>
+                I subscribed but the app still shows a lock.
+              </Text>
+              <Text style={styles.contentText}>
+                Open any VIP market popup and tap Restore purchases. If it still
+                does not unlock, contact support with the Google Play order
+                number from your purchase email.
               </Text>
             </View>
             <View style={styles.faqItem}>
@@ -191,29 +215,47 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
             onToggle={() => toggleSection("privacy")}
           >
             <Text style={styles.contentText}>
-              <Text style={styles.boldText}>Data Collection:</Text> We collect
-              minimal data necessary to provide our service, including device
-              information and usage analytics.
+              <Text style={styles.boldText}>Data Collection:</Text> We store a
+              random, non-personal app installation ID. It registers your push
+              notification token if you enable notifications, and identifies
+              your installation to Google Play so a subscription you buy can be
+              verified and restored. We never receive your card details — Google
+              Play handles all payment information.
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Data Usage:</Text> Your data is used
-              solely to improve the app experience and deliver personalized
-              predictions. We never sell your personal information.
+              only to deliver notifications, provide app content, prevent abuse,
+              and support the service. We do not sell personal information or
+              use it for advertising.
             </Text>
             <Text style={styles.contentText}>
-              <Text style={styles.boldText}>Data Storage:</Text> All data is
-              encrypted and stored securely. We follow industry-standard
-              security practices.
+              <Text style={styles.boldText}>Data Storage:</Text> Data sent to our
+              service providers is encrypted in transit. Notification messages
+              are also stored locally on your device.
             </Text>
             <Text style={styles.contentText}>
-              <Text style={styles.boldText}>Third Parties:</Text> We may use
-              analytics services to improve our app. These services have their
-              own privacy policies.
+              <Text style={styles.boldText}>Service Providers:</Text> We use
+              Google Firebase for app content and notifications, and Google Play
+              Billing for subscription payments and purchase verification.
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Your Rights:</Text> You can request
-              to view, modify, or delete your data at any time by contacting
-              support.
+              deletion of data associated with this installation by contacting
+              support. Revoking notification permission causes the app to make a
+              best-effort removal of its stored push token.
+            </Text>
+            <Text style={styles.contentText}>
+              Read our full privacy policy at{" "}
+              <Text
+                style={styles.linkText}
+                onPress={() =>
+                  Linking.openURL(
+                    "https://titan-tips-privacy-policy.lovable.app/privacy",
+                  )
+                }
+              >
+                titan-tips-privacy-policy.lovable.app/privacy
+              </Text>
             </Text>
           </CollapsibleSection>
 
@@ -226,12 +268,15 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
           >
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Acceptance:</Text> By using
-              VistaScores, you agree to these terms and our privacy policy.
+              TitanTips, you agree to these terms and our privacy policy.
             </Text>
             <Text style={styles.contentText}>
-              <Text style={styles.boldText}>Account Responsibility:</Text> You
-              are responsible for maintaining the security of your account and
-              any activities under it.
+              <Text style={styles.boldText}>Subscriptions:</Text> Paid plans are
+              sold and billed exclusively through Google Play. They renew
+              automatically at the price shown until cancelled, and can be
+              cancelled at any time in Google Play &rsaquo; Subscriptions.
+              TitanTips does not let users create an in-app account; access is
+              tied to the Google account that made the purchase.
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Prohibited Use:</Text> You may not
@@ -240,13 +285,19 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Intellectual Property:</Text> All
-              content, predictions, and branding are owned by VistaScores and
-              may not be reproduced without permission.
+              content, predictions, and branding are owned by TitanTips and may
+              not be reproduced without permission.
+            </Text>
+            <Text style={styles.contentText}>
+              <Text style={styles.boldText}>No Guarantees:</Text> Predictions are
+              opinions based on analysis. We do not guarantee any outcome, win
+              rate or return, and a subscription buys access to our analysis —
+              not a promised result.
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Limitation of Liability:</Text>{" "}
-              VistaScores is not liable for any losses incurred from following
-              our predictions.
+              TitanTips is not liable for any losses incurred from following our
+              predictions.
             </Text>
             <Text style={styles.contentText}>
               <Text style={styles.boldText}>Changes to Terms:</Text> We reserve
@@ -260,7 +311,7 @@ const LegalInfoSheet = forwardRef<BottomSheetModal, LegalInfoSheetProps>(
             <Shield size={24} color={PremiumColors.accent.primary} />
             <Text style={styles.contactTitle}>Need Help?</Text>
             <Text style={styles.contactText}>
-              Contact us at support@vistascores.com
+              Contact us at support@titanfootballtips.com
             </Text>
           </View>
         </BottomSheetScrollView>
@@ -345,6 +396,10 @@ const styles = StyleSheet.create({
   boldText: {
     fontWeight: "600",
     color: PremiumColors.text.primary,
+  },
+  linkText: {
+    color: PremiumColors.accent.primary,
+    textDecorationLine: "underline" as const,
   },
   faqItem: {
     marginBottom: 16,

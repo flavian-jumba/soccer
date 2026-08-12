@@ -1,129 +1,64 @@
-import { PremiumColors } from "@/constants/colors";
+import { resultStatus } from "@/constants/result-status";
 import type { MatchStatus } from "@/data/mockData";
 import React from "react";
-import { StyleSheet, Text } from "react-native";
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withSequence,
-    withTiming,
-} from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
 
 interface StatusBadgeProps {
   status: MatchStatus;
   size?: "small" | "medium" | "large";
 }
 
-const statusConfig = {
-  won: {
-    label: "WON",
-    backgroundColor: PremiumColors.status.wonBackground,
-    textColor: PremiumColors.status.won,
-    borderColor: PremiumColors.status.won,
-    glowColor: PremiumColors.status.wonGlow,
-  },
-  lost: {
-    label: "LOST",
-    backgroundColor: PremiumColors.status.lostBackground,
-    textColor: PremiumColors.status.lost,
-    borderColor: PremiumColors.status.lost,
-    glowColor: PremiumColors.status.lostGlow,
-  },
-  pending: {
-    label: "PENDING",
-    backgroundColor: PremiumColors.status.pendingBackground,
-    textColor: PremiumColors.status.pending,
-    borderColor: PremiumColors.status.pending,
-    glowColor: PremiumColors.status.pendingGlow,
-  },
-};
-
 const sizeConfig = {
-  small: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    fontSize: 9,
-    borderRadius: 4,
-  },
-  medium: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    fontSize: 10,
-    borderRadius: 6,
-  },
-  large: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    fontSize: 12,
-    borderRadius: 8,
-  },
+  small: { paddingHorizontal: 7, paddingVertical: 3, fontSize: 10, icon: 10, gap: 3 },
+  medium: { paddingHorizontal: 9, paddingVertical: 4, fontSize: 11, icon: 12, gap: 4 },
+  large: { paddingHorizontal: 11, paddingVertical: 5, fontSize: 12, icon: 13, gap: 5 },
 };
 
+/**
+ * Icon + word, muted surface, no pulse. The state reads the same to someone
+ * who cannot distinguish the accent colours.
+ */
 export function StatusBadge({ status, size = "medium" }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = resultStatus(status);
   const sizeStyle = sizeConfig[size];
-  const opacity = useSharedValue(1);
-
-  // Pulse animation for pending status
-  React.useEffect(() => {
-    if (status === "pending") {
-      opacity.value = withRepeat(
-        withSequence(
-          withDelay(0, withTiming(0.5, { duration: 1000 })),
-          withTiming(1, { duration: 1000 }),
-        ),
-        -1,
-        true,
-      );
-    } else {
-      opacity.value = 1;
-    }
-  }, [status, opacity]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+  const { Icon } = config;
 
   return (
-    <Animated.View
+    <View
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={config.label}
       style={[
         styles.badge,
         {
-          backgroundColor: config.backgroundColor,
-          borderColor: config.borderColor,
+          backgroundColor: config.surface,
+          borderColor: config.border,
           paddingHorizontal: sizeStyle.paddingHorizontal,
           paddingVertical: sizeStyle.paddingVertical,
-          borderRadius: sizeStyle.borderRadius,
+          gap: sizeStyle.gap,
         },
-        animatedStyle,
       ]}
     >
-      <Text
-        style={[
-          styles.text,
-          {
-            color: config.textColor,
-            fontSize: sizeStyle.fontSize,
-          },
-        ]}
-      >
+      <Icon size={sizeStyle.icon} strokeWidth={2.4} color={config.color} />
+      <Text style={[styles.text, { color: config.color, fontSize: sizeStyle.fontSize }]}>
         {config.label}
       </Text>
-    </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   badge: {
-    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
     alignSelf: "flex-start",
+    borderWidth: 1,
+    borderRadius: 999,
+    borderCurve: "continuous",
   },
   text: {
-    fontWeight: "700",
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
+    fontWeight: "600",
+    letterSpacing: 0.2,
   },
 });
 

@@ -1,5 +1,5 @@
 /**
- * Mock data for VistaScores sports prediction app
+ * Mock data for TitanTips sports prediction app
  * Rich realistic data for Categories, Matches, and Won Games
  */
 
@@ -24,6 +24,8 @@ export interface Category {
   isVip: boolean;
   matchCount: number;
   winRate: number;
+  order?: number;
+  isActive?: boolean;
 }
 
 export interface Match {

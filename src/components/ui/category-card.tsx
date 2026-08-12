@@ -1,211 +1,217 @@
 import { PremiumColors } from "@/constants/colors";
-import type { Category, IconName } from "@/data/mockData";
-import {
-    Award,
-    Crown,
-    Flame,
-    Goal,
-    Lock,
-    Percent,
-    Star,
-    Target,
-    TrendingUp,
-    Trophy,
-    Zap,
-} from "lucide-react-native";
+import { resolveIcon } from "@/constants/icons";
+import type { Category } from "@/data/mockData";
+import { ChevronRight, Lock } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { AnimatedPressableButton } from "./animated-pressable";
-import { GlassCard } from "./glass-card";
 
 interface CategoryCardProps {
   category: Category;
   onPress: () => void;
+  mode?: "home" | "vip";
+  featured?: boolean;
+  /** VIP category the user has no active subscription for. */
+  locked?: boolean;
+  /** Hide the "Tap to unlock" status row for locked cards. */
+  hideLockedStatus?: boolean;
 }
 
-const iconMap: Record<IconName, React.ComponentType<any>> = {
-  Goal,
-  TrendingUp,
-  Target,
-  Trophy,
-  Zap,
-  Crown,
-  Star,
-  Flame,
-  Award,
-  Percent,
-};
-
-export function CategoryCard({ category, onPress }: CategoryCardProps) {
-  const IconComponent = iconMap[category.icon] || Target;
+export function CategoryCard({
+  category,
+  onPress,
+  mode = "home",
+  featured = false,
+  locked = false,
+  hideLockedStatus = false,
+}: CategoryCardProps) {
+  const Icon = resolveIcon(category.icon);
   const isVip = category.isVip;
 
   return (
-    <AnimatedPressableButton onPress={onPress} scaleValue={0.96}>
-      <GlassCard
-        variant={isVip ? "gold" : "default"}
-        style={[styles.card, isVip && styles.vipCard]}
-      >
-        {/* VIP Lock Overlay */}
-        {isVip && (
-          <View style={styles.lockOverlay}>
-            <View style={styles.lockIconContainer}>
-              <Lock
-                size={24}
-                color={PremiumColors.gold.light}
-                strokeWidth={2.5}
-              />
-            </View>
-          </View>
-        )}
-
-        {/* Icon */}
-        <View style={[styles.iconContainer, isVip && styles.vipIconContainer]}>
-          <IconComponent
-            size={28}
+    <AnimatedPressableButton
+      onPress={onPress}
+      scaleValue={0.975}
+      style={[
+        styles.card,
+        mode === "home" ? styles.homeCard : styles.vipCard,
+        featured && styles.featuredCard,
+        isVip && styles.goldEdge,
+      ]}
+    >
+      <View style={styles.topRow}>
+        <View
+          style={[
+            styles.icon,
+            isVip ? styles.goldIcon : styles.blueIcon,
+            mode === "vip" && !featured && styles.greenIcon,
+          ]}
+        >
+          <Icon
+            size={22}
             color={
-              isVip ? PremiumColors.gold.primary : PremiumColors.accent.primary
+              isVip
+                ? featured
+                  ? PremiumColors.gold.light
+                  : PremiumColors.status.wonGlow
+                : PremiumColors.accent.primaryGlow
             }
-            strokeWidth={2}
           />
         </View>
-
-        {/* Title */}
-        <Text
-          style={[styles.title, isVip && styles.vipTitle]}
-          numberOfLines={1}
-        >
-          {category.title}
-        </Text>
-
-        {/* Description */}
-        <Text style={styles.description} numberOfLines={1}>
-          {category.description}
-        </Text>
-
-        {/* Badge */}
-        <View
-          style={[styles.badge, isVip ? styles.vipBadge : styles.freeBadge]}
-        >
-          <Text
-            style={[
-              styles.badgeText,
-              isVip ? styles.vipBadgeText : styles.freeBadgeText,
-            ]}
-          >
-            {isVip ? "VIP" : "FREE"}
+        <View style={[styles.badge, isVip ? styles.vipBadge : styles.freeBadge]}>
+          <Text style={[styles.badgeText, isVip && styles.vipBadgeText]}>
+            {isVip ? "♛ VIP" : "FREE"}
           </Text>
         </View>
+      </View>
 
-        {/* Stats Row */}
-        <View style={styles.statsRow}>
-          <Text style={styles.statText}>{category.matchCount} tips</Text>
-          <View style={styles.winRateBadge}>
-            <Text style={styles.winRateText}>{category.winRate}%</Text>
+      <Text style={styles.title} numberOfLines={2}>
+        {category.title}
+      </Text>
+      <Text style={styles.description} numberOfLines={2}>
+        {category.description}
+      </Text>
+
+      <View style={styles.footer}>
+        {locked && hideLockedStatus ? (
+          <View />
+        ) : (
+          <View style={styles.statusRow}>
+            <View
+              style={[
+                styles.dot,
+                { backgroundColor: isVip ? PremiumColors.gold.light : "#4CC9FF" },
+              ]}
+            />
+            <Text style={[styles.status, isVip && styles.goldStatus]}>
+              {locked
+                ? "Tap to unlock"
+                : mode === "vip"
+                  ? "Unlocked"
+                  : category.matchCount > 0
+                    ? `${category.matchCount} active`
+                    : "Active"}
+            </Text>
           </View>
-        </View>
-      </GlassCard>
+        )}
+        {locked ? (
+          <Lock size={15} color={PremiumColors.text.muted} strokeWidth={2.2} />
+        ) : (
+          <ChevronRight size={16} color={PremiumColors.text.muted} />
+        )}
+      </View>
     </AnimatedPressableButton>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 150,
-    padding: 16,
-    marginRight: 12,
-    position: "relative",
+    backgroundColor: "#171720",
+    borderWidth: 1,
+    borderColor: PremiumColors.glass.border,
+    borderRadius: 18,
+    borderCurve: "continuous",
+    padding: 14,
+    minHeight: 158,
+  },
+  homeCard: {
+    flex: 1,
   },
   vipCard: {
-    borderColor: "rgba(245, 158, 11, 0.4)",
+    width: "48.2%",
+    minHeight: 168,
   },
-  lockOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    justifyContent: "center",
+  featuredCard: {
+    width: "100%",
+    minHeight: 176,
+    borderColor: "rgba(251, 191, 36, 0.7)",
+    backgroundColor: "#151A21",
+  },
+  goldEdge: {
+    borderBottomColor: "rgba(251, 191, 36, 0.55)",
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  icon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
     alignItems: "center",
-    zIndex: 10,
-    borderRadius: 16,
-  },
-  lockIconContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    borderRadius: 50,
-    padding: 12,
-    borderWidth: 2,
-    borderColor: PremiumColors.gold.primary,
-  },
-  iconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: "rgba(59, 130, 246, 0.15)",
     justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
   },
-  vipIconContainer: {
-    backgroundColor: "rgba(245, 158, 11, 0.15)",
+  blueIcon: {
+    backgroundColor: "rgba(59, 130, 246, 0.14)",
+    borderWidth: 1,
+    borderColor: "rgba(96, 165, 250, 0.24)",
   },
-  title: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: PremiumColors.text.primary,
-    marginBottom: 4,
+  goldIcon: {
+    backgroundColor: "rgba(245, 158, 11, 0.13)",
   },
-  vipTitle: {
-    color: PremiumColors.gold.light,
-  },
-  description: {
-    fontSize: 12,
-    color: PremiumColors.text.tertiary,
-    marginBottom: 12,
+  greenIcon: {
+    backgroundColor: "rgba(16, 185, 129, 0.14)",
   },
   badge: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 7,
+    borderWidth: 1,
   },
   freeBadge: {
-    backgroundColor: "rgba(16, 185, 129, 0.2)",
+    backgroundColor: "rgba(59, 130, 246, 0.12)",
+    borderColor: "rgba(96, 165, 250, 0.25)",
   },
   vipBadge: {
-    backgroundColor: "rgba(245, 158, 11, 0.2)",
+    backgroundColor: "rgba(245, 158, 11, 0.12)",
+    borderColor: "rgba(251, 191, 36, 0.26)",
   },
   badgeText: {
+    color: PremiumColors.accent.primaryGlow,
     fontSize: 9,
     fontWeight: "800",
-    letterSpacing: 0.5,
-  },
-  freeBadgeText: {
-    color: PremiumColors.status.won,
   },
   vipBadgeText: {
-    color: PremiumColors.gold.primary,
+    color: PremiumColors.gold.light,
   },
-  statsRow: {
+  title: {
+    color: PremiumColors.text.primary,
+    fontSize: 15,
+    fontWeight: "700",
+    paddingTop: 12,
+  },
+  description: {
+    color: PremiumColors.text.tertiary,
+    fontSize: 11,
+    lineHeight: 16,
+    paddingTop: 4,
+    flexGrow: 1,
+  },
+  footer: {
+    paddingTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: "auto",
   },
-  statText: {
-    fontSize: 11,
-    color: PremiumColors.text.tertiary,
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
-  winRateBadge: {
-    backgroundColor: "rgba(16, 185, 129, 0.15)",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
   },
-  winRateText: {
+  status: {
+    color: "#4CC9FF",
     fontSize: 10,
     fontWeight: "700",
-    color: PremiumColors.status.won,
-    fontFamily: "monospace",
+    textTransform: "uppercase",
+  },
+  goldStatus: {
+    color: PremiumColors.gold.light,
   },
 });
 

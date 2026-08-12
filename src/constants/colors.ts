@@ -63,6 +63,23 @@ export const PremiumColors = {
     liveGlow: "#FCD34D",
   },
 
+  /**
+   * Calm result-status palette. Losses never use alarm red — a muted clay
+   * orange with grey accents keeps a settled prediction readable without
+   * making it feel like a failure state.
+   */
+  result: {
+    won: "#34D399",
+    wonSurface: "rgba(52, 211, 153, 0.10)",
+    wonBorder: "rgba(52, 211, 153, 0.26)",
+    lost: "#D08A55",
+    lostSurface: "rgba(208, 138, 85, 0.09)",
+    lostBorder: "rgba(208, 138, 85, 0.22)",
+    pending: "#8B93A7",
+    pendingSurface: "rgba(139, 147, 167, 0.09)",
+    pendingBorder: "rgba(139, 147, 167, 0.20)",
+  },
+
   // Category badge colors
   badge: {
     free: "#10B981",

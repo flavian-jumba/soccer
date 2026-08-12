@@ -33,6 +33,11 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Sensitive credentials — NEVER commit these
+serviceAccountKey.json
+credentials.json
+/Titan Football Tips_upload_signing_credentials/
+
 # typescript
 *.tsbuildinfo
 
@@ -41,6 +46,3 @@ app-example
 # generated native folders
 /ios
 /android
-
-# Firebase service account key - NEVER commit this
-serviceAccountKey.json

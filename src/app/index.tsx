@@ -23,7 +23,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TERMS_ACCEPTED_KEY = "vista_terms_accepted";
+export const TERMS_ACCEPTED_KEY = "titan_terms_accepted";
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
@@ -115,8 +115,8 @@ export default function WelcomeScreen() {
             <Sparkles size={48} color={PremiumColors.accent.primary} />
           </View>
         </View>
-        <Text style={styles.appName}>VistaScores</Text>
-        <Text style={styles.tagline}>Premium Sports Predictions</Text>
+        <Text style={styles.appName}>TitanTips</Text>
+        <Text style={styles.tagline}>Premium Football Predictions</Text>
       </Animated.View>
 
       {/* Terms Card */}

@@ -1,0 +1,217 @@
+[debug] [2026-07-25T08:40:06.215Z] ----------------------------------------------------------------------
+[debug] [2026-07-25T08:40:06.218Z] Command:       /usr/bin/node /tmp/titan-firebase-cli-official/_npx/3ef83e5e4206802b/node_modules/.bin/firebase deploy --only firestore:rules --project titanfootballtips-43797
+[debug] [2026-07-25T08:40:06.218Z] CLI Version:   14.22.0
+[debug] [2026-07-25T08:40:06.218Z] Platform:      linux
+[debug] [2026-07-25T08:40:06.218Z] Node Version:  v20.20.2
+[debug] [2026-07-25T08:40:06.219Z] Time:          Sat Jul 25 2026 11:40:06 GMT+0300 (East Africa Time)
+[debug] [2026-07-25T08:40:06.219Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-25T08:40:06.222Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-25T08:40:06.632Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-25T08:40:06.633Z] > authorizing via signed-in user (legendfootballtips@gmail.com)
+[debug] [2026-07-25T08:40:06.634Z] [iam] checking project titanfootballtips-43797 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-07-25T08:40:06.634Z] Checked if tokens are valid: false, expires at: 1777312659426
+[debug] [2026-07-25T08:40:06.635Z] Checked if tokens are valid: false, expires at: 1777312659426
+[debug] [2026-07-25T08:40:06.635Z] > refreshing access token with scopes: []
+[debug] [2026-07-25T08:40:06.637Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-25T08:40:06.637Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-25T08:40:07.036Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-07-25T08:40:07.037Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-25T08:40:07.050Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions [none]
+[debug] [2026-07-25T08:40:07.050Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions x-goog-quota-user=projects/titanfootballtips-43797
+[debug] [2026-07-25T08:40:07.050Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-07-25T08:40:07.383Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-07-25T08:40:07.384Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-07-25T08:40:13.980Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions 200
+[debug] [2026-07-25T08:40:13.980Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {}
+[debug] [2026-07-25T08:40:13.981Z] [iam] error while checking permissions, command may fail: Authorization failed. This account is missing the following required permissions on project titanfootballtips-43797:
+
+  datastore.indexes.create
+  datastore.indexes.delete
+  datastore.indexes.list
+  datastore.indexes.update
+  firebase.projects.get
+[info] 
+[info] === Deploying to 'titanfootballtips-43797'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-07-25T08:40:13.990Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:13.990Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:13.990Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) [none]
+[debug] [2026-07-25T08:40:15.481Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) 403
+[debug] [2026-07-25T08:40:15.481Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-07-25T08:40:15.489Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:15.489Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:15.490Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test [none]
+[debug] [2026-07-25T08:40:15.490Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test [omitted]
+[debug] [2026-07-25T08:40:17.108Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test 403
+[debug] [2026-07-25T08:40:17.108Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"IAM_PERMISSION_DENIED","domain":"iam.googleapis.com","metadata":{"resource":"projects/titanfootballtips-43797","error_info_id":"CiQwMTlmOTg2ZS1hODc4LTc4MTUtOThmNi03NmUwZGQxNmNhYjYSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3","troubleshooter_url":"https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=CiQwMTlmOTg2ZS1hODc4LTc4MTUtOThmNi03NmUwZGQxNmNhYjYSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3","permission":"firebaserules.rulesets.test"}}]}}
+[error] 
+[error] Error: Request to https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test had HTTP Error: 403, The caller does not have permission
+[debug] [2026-07-25T08:40:17.442Z] Error Context: {
+  "body": {
+    "error": {
+      "code": 403,
+      "message": "The caller does not have permission",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "IAM_PERMISSION_DENIED",
+          "domain": "iam.googleapis.com",
+          "metadata": {
+            "resource": "projects/titanfootballtips-43797",
+            "error_info_id": "CiQwMTlmOTg2ZS1hODc4LTc4MTUtOThmNi03NmUwZGQxNmNhYjYSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3",
+            "troubleshooter_url": "https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=CiQwMTlmOTg2ZS1hODc4LTc4MTUtOThmNi03NmUwZGQxNmNhYjYSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3",
+            "permission": "firebaserules.rulesets.test"
+          }
+        }
+      ]
+    }
+  },
+  "response": {
+    "statusCode": 403
+  }
+}
+[debug] [2026-07-25T08:40:32.139Z] ----------------------------------------------------------------------
+[debug] [2026-07-25T08:40:32.141Z] Command:       /usr/bin/node /tmp/titan-firebase-cli-official/_npx/3ef83e5e4206802b/node_modules/.bin/firebase deploy --only firestore:rules --project titanfootballtips-43797
+[debug] [2026-07-25T08:40:32.142Z] CLI Version:   14.22.0
+[debug] [2026-07-25T08:40:32.142Z] Platform:      linux
+[debug] [2026-07-25T08:40:32.142Z] Node Version:  v20.20.2
+[debug] [2026-07-25T08:40:32.142Z] Time:          Sat Jul 25 2026 11:40:32 GMT+0300 (East Africa Time)
+[debug] [2026-07-25T08:40:32.143Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-25T08:40:32.472Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-25T08:40:32.473Z] > authorizing via signed-in user (legendfootballtips@gmail.com)
+[debug] [2026-07-25T08:40:32.473Z] [iam] checking project titanfootballtips-43797 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-07-25T08:40:32.475Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:32.475Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:32.478Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions [none]
+[debug] [2026-07-25T08:40:32.478Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions x-goog-quota-user=projects/titanfootballtips-43797
+[debug] [2026-07-25T08:40:32.479Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-07-25T08:40:34.590Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions 200
+[debug] [2026-07-25T08:40:34.591Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {}
+[debug] [2026-07-25T08:40:34.591Z] [iam] error while checking permissions, command may fail: Authorization failed. This account is missing the following required permissions on project titanfootballtips-43797:
+
+  datastore.indexes.create
+  datastore.indexes.delete
+  datastore.indexes.list
+  datastore.indexes.update
+  firebase.projects.get
+[info] 
+[info] === Deploying to 'titanfootballtips-43797'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-07-25T08:40:34.602Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:34.602Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:34.602Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) [none]
+[debug] [2026-07-25T08:40:36.085Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) 403
+[debug] [2026-07-25T08:40:36.086Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/titanfootballtips-43797/databases/(default) {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-07-25T08:40:36.089Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:36.090Z] Checked if tokens are valid: true, expires at: 1784972406037
+[debug] [2026-07-25T08:40:36.090Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test [none]
+[debug] [2026-07-25T08:40:36.090Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test [omitted]
+[debug] [2026-07-25T08:40:37.201Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test 403
+[debug] [2026-07-25T08:40:37.201Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"IAM_PERMISSION_DENIED","domain":"iam.googleapis.com","metadata":{"resource":"projects/titanfootballtips-43797","error_info_id":"CiQwMTlmOTg2ZS1mN2Y4LTdhMTItYjE1Ni05OGIyNzNiMjhlM2YSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3","troubleshooter_url":"https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=CiQwMTlmOTg2ZS1mN2Y4LTdhMTItYjE1Ni05OGIyNzNiMjhlM2YSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3","permission":"firebaserules.rulesets.test"}}]}}
+[error] 
+[error] Error: Request to https://firebaserules.googleapis.com/v1/projects/titanfootballtips-43797:test had HTTP Error: 403, The caller does not have permission
+[debug] [2026-07-25T08:40:38.152Z] Error Context: {
+  "body": {
+    "error": {
+      "code": 403,
+      "message": "The caller does not have permission",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "IAM_PERMISSION_DENIED",
+          "domain": "iam.googleapis.com",
+          "metadata": {
+            "resource": "projects/titanfootballtips-43797",
+            "error_info_id": "CiQwMTlmOTg2ZS1mN2Y4LTdhMTItYjE1Ni05OGIyNzNiMjhlM2YSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3",
+            "troubleshooter_url": "https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=CiQwMTlmOTg2ZS1mN2Y4LTdhMTItYjE1Ni05OGIyNzNiMjhlM2YSIHByb2plY3RzL3RpdGFuZm9vdGJhbGx0aXBzLTQzNzk3",
+            "permission": "firebaserules.rulesets.test"
+          }
+        }
+      ]
+    }
+  },
+  "response": {
+    "statusCode": 403
+  }
+}
+[debug] [2026-07-25T08:41:15.946Z] ----------------------------------------------------------------------
+[debug] [2026-07-25T08:41:15.949Z] Command:       /usr/bin/node /tmp/titan-firebase-cli-official/_npx/3ef83e5e4206802b/node_modules/.bin/firebase deploy --only firestore:rules --project titanfootballtips-43797
+[debug] [2026-07-25T08:41:15.950Z] CLI Version:   14.22.0
+[debug] [2026-07-25T08:41:15.950Z] Platform:      linux
+[debug] [2026-07-25T08:41:15.950Z] Node Version:  v20.20.2
+[debug] [2026-07-25T08:41:15.950Z] Time:          Sat Jul 25 2026 11:41:15 GMT+0300 (East Africa Time)
+[debug] [2026-07-25T08:41:15.950Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-25T08:41:15.953Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-25T08:41:16.369Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-25T08:41:16.627Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: 
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2026-07-25T08:41:16.629Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json
+[debug] [2026-07-25T08:41:16.855Z] Running auto auth
+[debug] [2026-07-25T08:41:16.857Z] [iam] checking project titanfootballtips-43797 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-07-25T08:41:16.859Z] No OAuth tokens found
+[debug] [2026-07-25T08:41:16.860Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions [none]
+[debug] [2026-07-25T08:41:16.861Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions x-goog-quota-user=projects/titanfootballtips-43797
+[debug] [2026-07-25T08:41:16.861Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-07-25T08:41:18.975Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions 200
+[debug] [2026-07-25T08:41:18.975Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/titanfootballtips-43797:testIamPermissions {"permissions":["datastore.indexes.list","firebase.projects.get"]}
+[debug] [2026-07-25T08:41:18.975Z] [iam] error while checking permissions, command may fail: Authorization failed. This account is missing the following required permissions on project titanfootballtips-43797:
+
+  datastore.indexes.create
+  datastore.indexes.delete
+  datastore.indexes.update
+[info] 
+[info] === Deploying to 'titanfootballtips-43797'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-07-25T08:41:18.980Z] No OAuth tokens found
+[debug] [2026-07-25T08:41:18.980Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/titanfootballtips-43797/services/firestore.googleapis.com [none]
+[debug] [2026-07-25T08:41:18.980Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/titanfootballtips-43797/services/firestore.googleapis.com x-goog-quota-user=projects/titanfootballtips-43797
+[debug] [2026-07-25T08:41:20.825Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/titanfootballtips-43797/services/firestore.googleapis.com 403
+[debug] [2026-07-25T08:41:20.826Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/titanfootballtips-43797/services/firestore.googleapis.com [omitted]
+[error] 
+[error] Error: Request to https://serviceusage.googleapis.com/v1/projects/titanfootballtips-43797/services/firestore.googleapis.com had HTTP Error: 403, Permission denied to get service [firestore.googleapis.com]
+Help Token: AdZh9GcJ8EmvOlGUZ2CYZLzBB71Qz2_05ReGx9VGX0mVYJCNIy2gtAfYOAATfZEJubhRbQWLlWGPKHM8f0QNx3YoHGoAtPrZBIwBDui8OI72oIZP
+[debug] [2026-07-25T08:41:20.831Z] Error Context: {
+  "body": {
+    "error": {
+      "code": 403,
+      "message": "Permission denied to get service [firestore.googleapis.com]\nHelp Token: AdZh9GcJ8EmvOlGUZ2CYZLzBB71Qz2_05ReGx9VGX0mVYJCNIy2gtAfYOAATfZEJubhRbQWLlWGPKHM8f0QNx3YoHGoAtPrZBIwBDui8OI72oIZP",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.PreconditionFailure",
+          "violations": [
+            {
+              "type": "googleapis.com",
+              "subject": "110002"
+            }
+          ]
+        },
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "AUTH_PERMISSION_DENIED",
+          "domain": "serviceusage.googleapis.com"
+        }
+      ]
+    }
+  },
+  "response": {
+    "statusCode": 403
+  }
+}

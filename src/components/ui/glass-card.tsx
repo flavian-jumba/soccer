@@ -1,19 +1,10 @@
 import { PremiumColors } from "@/constants/colors";
+import { GlassView } from "expo-glass-effect";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { Platform, StyleSheet, View, ViewProps } from "react-native";
 
-// Try to use expo-glass-effect on supported platforms
-let GlassViewComponent: React.ComponentType<any> | null = null;
-try {
-  if (Platform.OS === "ios") {
-    const { GlassView } = require("expo-glass-effect");
-    GlassViewComponent = GlassView;
-    cssInterop(GlassView, { className: "style" });
-  }
-} catch {
-  // expo-glass-effect not available
-}
+cssInterop(GlassView, { className: "style" });
 
 export type GlassCardVariant = "default" | "gold" | "success" | "elevated";
 
@@ -52,9 +43,9 @@ export function GlassCard({
   const variantStyle = variantStyles[variant];
 
   // Use native GlassView on iOS if available
-  if (GlassViewComponent && Platform.OS === "ios") {
+  if (Platform.OS === "ios") {
     return (
-      <GlassViewComponent
+      <GlassView
         glassEffectStyle="clear"
         className={className}
         style={[
@@ -67,7 +58,7 @@ export function GlassCard({
         {...props}
       >
         {children}
-      </GlassViewComponent>
+      </GlassView>
     );
   }
 

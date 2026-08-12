@@ -1,232 +1,256 @@
 import { PremiumColors } from "@/constants/colors";
+import { isSettled, resultStatus } from "@/constants/result-status";
 import type { Match } from "@/data/mockData";
-import { Calendar, Clock, TrendingUp } from "lucide-react-native";
+import { Flag, Lock } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { StatusBadge } from "./status-badge";
 
 interface MatchRowProps {
   match: Match;
+  /**
+   * Preview mode. Hides both the pick and the odds behind a Premium badge until
+   * the match is settled — a visible price is most of the tip, so showing it
+   * would give the selection away.
+   */
+  lockUntilSettled?: boolean;
 }
 
-export function MatchRow({ match }: MatchRowProps) {
-  const statusConfig = {
-    won: {
-      label: "WON",
-      bgColor: PremiumColors.status.wonBackground,
-      textColor: PremiumColors.status.won,
-      borderColor: "rgba(16, 185, 129, 0.3)",
-    },
-    lost: {
-      label: "LOST",
-      bgColor: PremiumColors.status.lostBackground,
-      textColor: PremiumColors.status.lost,
-      borderColor: "rgba(239, 68, 68, 0.3)",
-    },
-    pending: {
-      label: "PENDING",
-      bgColor: PremiumColors.status.pendingBackground,
-      textColor: PremiumColors.status.pending,
-      borderColor: "rgba(59, 130, 246, 0.3)",
-    },
-  };
-
-  const status = statusConfig[match.status];
-  const predictionColor =
-    match.status === "won"
-      ? PremiumColors.status.won
-      : match.status === "lost"
-        ? PremiumColors.status.lost
-        : PremiumColors.gold.primary;
+export function MatchRow({ match, lockUntilSettled = false }: MatchRowProps) {
+  const status = resultStatus(match.status);
+  const settled = isSettled(match.status);
+  const locked = lockUntilSettled && !settled;
+  const { Icon } = status;
 
   return (
-    <View style={styles.container}>
-      {/* Top Row: Date | Status | Odds */}
-      <View style={styles.topRow}>
-        {/* Date */}
-        <View style={styles.dateContainer}>
-          <Calendar size={14} color={PremiumColors.text.tertiary} />
-          <Text style={styles.dateText}>{match.date}</Text>
-        </View>
-
-        {/* Status Badge */}
-        <View
-          style={[
-            styles.statusBadge,
-            {
-              backgroundColor: status.bgColor,
-              borderColor: status.borderColor,
-            },
-          ]}
-        >
-          <Clock size={12} color={status.textColor} />
-          <Text style={[styles.statusText, { color: status.textColor }]}>
-            {status.label}
+    <View style={styles.card}>
+      {/* League strip */}
+      <View style={styles.strip}>
+        <View style={styles.stripLeft}>
+          <Flag size={13} color={PremiumColors.text.secondary} strokeWidth={2.2} />
+          <Text style={styles.league} numberOfLines={1}>
+            {match.league}
           </Text>
         </View>
+        <StatusBadge status={match.status} size="small" />
+      </View>
 
-        {/* Odds Badge */}
-        <View style={styles.oddsBadge}>
-          <TrendingUp size={14} color={PremiumColors.status.won} />
-          <Text style={styles.oddsText}>{match.odds}</Text>
+      {/* Kickoff | teams | odds */}
+      <View style={styles.body}>
+        <View style={styles.when}>
+          <Text style={styles.date}>{match.date}</Text>
+          <Text style={styles.time}>{match.time}</Text>
+        </View>
+        <View style={styles.rule} />
+
+        <View style={styles.teams}>
+          <View style={styles.teamRow}>
+            <View style={styles.dot} />
+            <Text style={styles.team} numberOfLines={1}>
+              {match.homeTeam}
+            </Text>
+          </View>
+          <View style={styles.teamRow}>
+            <View style={styles.dot} />
+            <Text style={styles.team} numberOfLines={1}>
+              {match.awayTeam}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.right}>
+          {locked ? (
+            <View
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel="Premium odds, revealed once the result is in"
+              style={styles.premiumBadge}
+            >
+              <Lock size={10} color={PremiumColors.gold.light} strokeWidth={2.4} />
+              <Text style={styles.premiumText}>Premium</Text>
+            </View>
+          ) : (
+            <View style={styles.oddsChip}>
+              <Text style={styles.oddsText}>{match.odds}</Text>
+            </View>
+          )}
+          {locked ? (
+            <Text style={styles.masked}>•••</Text>
+          ) : match.score ? (
+            <Text style={styles.score}>{match.score}</Text>
+          ) : (
+            <Icon size={13} color={status.color} strokeWidth={2.2} />
+          )}
         </View>
       </View>
 
-      {/* League */}
-      <Text style={styles.league}>{match.league}</Text>
-
-      {/* Teams Row - Side by Side */}
-      <View style={styles.teamsRow}>
-        <Text style={styles.homeTeam} numberOfLines={1}>
-          {match.homeTeam}
-        </Text>
-        <Text style={styles.vsText}>vs</Text>
-        <Text style={styles.awayTeam} numberOfLines={1}>
-          {match.awayTeam}
-        </Text>
-      </View>
-
-      {/* Score (if available) */}
-      {match.score && (
-        <View style={styles.scoreContainer}>
-          <Text style={[styles.scoreText, { color: status.textColor }]}>
-            {match.score}
+      {/* Prediction */}
+      <View style={styles.footer}>
+        {locked ? (
+          <View style={styles.lockRow}>
+            <Lock size={12} color={PremiumColors.text.tertiary} strokeWidth={2.2} />
+            <Text style={styles.lockText}>Revealed once the result is in</Text>
+          </View>
+        ) : (
+          <Text style={[styles.prediction, { color: status.color }]} numberOfLines={1}>
+            {match.prediction}
           </Text>
-        </View>
-      )}
-
-      {/* Prediction Bar */}
-      <View style={styles.predictionBar}>
-        <Text style={styles.predictionLabel}>Prediction:</Text>
-        <Text style={[styles.predictionValue, { color: predictionColor }]}>
-          {match.prediction}
-        </Text>
+        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: PremiumColors.glass.background,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+  card: {
+    backgroundColor: PremiumColors.background.tertiary,
+    borderRadius: 14,
+    borderCurve: "continuous",
     borderWidth: 1,
     borderColor: PremiumColors.glass.border,
+    overflow: "hidden",
+    marginBottom: 10,
   },
-  topRow: {
+  strip: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    justifyContent: "space-between",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    backgroundColor: PremiumColors.background.elevated,
   },
-  dateContainer: {
+  stripLeft: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
-  dateText: {
+  league: {
+    flex: 1,
     fontSize: 12,
-    color: PremiumColors.text.secondary,
-    fontFamily: "monospace",
+    fontWeight: "600",
+    color: PremiumColors.text.primary,
   },
-  statusBadge: {
+  premiumBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(245, 158, 11, 0.12)",
     borderWidth: 1,
+    borderColor: "rgba(245, 158, 11, 0.28)",
   },
-  statusText: {
+  premiumText: {
     fontSize: 10,
     fontWeight: "700",
-    letterSpacing: 0.5,
-    fontFamily: "monospace",
+    letterSpacing: 0.2,
+    color: PremiumColors.gold.light,
   },
-  oddsBadge: {
+  body: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  when: {
+    width: 62,
+    gap: 2,
+  },
+  date: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: PremiumColors.text.secondary,
+  },
+  time: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: PremiumColors.text.tertiary,
+  },
+  rule: {
+    alignSelf: "stretch",
+    width: 1,
+    backgroundColor: PremiumColors.glass.border,
+  },
+  teams: {
+    flex: 1,
+    gap: 6,
+  },
+  teamRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: PremiumColors.text.muted,
+  },
+  team: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "600",
+    color: PremiumColors.text.primary,
+  },
+  /** Fixed width so a locked "Premium" pill and a revealed odds chip align. */
+  right: {
+    width: 76,
+    alignItems: "center",
     gap: 5,
-    backgroundColor: "rgba(16, 185, 129, 0.1)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+  },
+  oddsChip: {
+    minWidth: 48,
+    alignItems: "center",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
     borderRadius: 8,
+    borderCurve: "continuous",
+    backgroundColor: PremiumColors.glass.backgroundLight,
     borderWidth: 1,
-    borderColor: "rgba(16, 185, 129, 0.2)",
+    borderColor: PremiumColors.glass.border,
   },
   oddsText: {
     fontSize: 13,
     fontWeight: "700",
-    color: PremiumColors.status.won,
-    fontFamily: "monospace",
+    color: PremiumColors.gold.light,
   },
-  league: {
-    fontSize: 11,
-    fontWeight: "500",
-    color: PremiumColors.text.tertiary,
-    marginBottom: 12,
-    fontStyle: "italic",
-  },
-  teamsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-    gap: 16,
-  },
-  homeTeam: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "600",
-    color: PremiumColors.text.primary,
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  vsText: {
-    fontSize: 13,
-    color: PremiumColors.text.tertiary,
-    fontWeight: "400",
-    fontStyle: "italic",
-  },
-  awayTeam: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "600",
-    color: PremiumColors.text.primary,
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  scoreContainer: {
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  scoreText: {
-    fontSize: 24,
+  masked: {
+    fontSize: 12,
     fontWeight: "700",
-    fontFamily: "monospace",
-    letterSpacing: 2,
+    color: PremiumColors.text.muted,
+    letterSpacing: 1.5,
   },
-  predictionBar: {
+  score: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: PremiumColors.text.secondary,
+    letterSpacing: 0.5,
+  },
+  footer: {
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderTopWidth: 1,
+    borderTopColor: PremiumColors.glass.border,
+  },
+  prediction: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  lockRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
     gap: 6,
   },
-  predictionLabel: {
-    fontSize: 13,
+  lockText: {
+    fontSize: 12,
+    fontWeight: "500",
     color: PremiumColors.text.tertiary,
-    fontStyle: "italic",
-  },
-  predictionValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    fontStyle: "italic",
   },
 });
 

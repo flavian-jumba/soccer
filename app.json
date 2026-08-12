@@ -1,23 +1,44 @@
 {
   "expo": {
-    "name": "Titan Scores",
-    "slug": "Titan Scores",
-    "version": "1.0.0",
+    "name": "TitanTips",
+    "slug": "titan-football-tips-",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "TitanScores",
+    "scheme": "titantips",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
     "android": {
+      "package": "com.titantips.titantips",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundImage": "./assets/images/android-icon-background.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": true,
+      "allowBackup": false,
+      "usesCleartextTraffic": false,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "com.android.vending.BILLING"
+      ],
+      "blockedPermissions": [
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_CONTACTS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_CONTACTS",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -35,11 +56,69 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#000000",
+          "defaultChannel": "general",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "minSdkVersion": 24,
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "extraProguardRules": "-dontwarn com.android.billingclient.api.**\n-dontwarn com.android.vending.billing.**"
+          }
+        }
+      ],
+      "expo-secure-store",
+      "expo-iap"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7638332f-ab07-497b-b046-e6637263f448"
+      },
+      "billingEnabled": true,
+      "communityUrl": "https://t.me/titanfootballtips",
+      "billing": {
+        "productIds": {
+          "special_vvip_weekly": "special_vvip_weekly",
+          "special_vvip_monthly": "special_vvip_monthly",
+          "correct_scores_weekly": "correct_scores_weekly",
+          "correct_scores_monthly": "correct_scores_monthly",
+          "ht_ft_vip_weekly": "ht_ft_vip_weekly",
+          "ht_ft_vip_monthly": "ht_ft_vip_monthly",
+          "over_under_vip_weekly": "over_under_vip_weekly",
+          "over_under_vip_monthly": "over_under_vip_monthly",
+          "titan_10_odds_weekly": "titan_10_odds_weekly",
+          "titan_10_odds_monthly": "titan_10_odds_monthly",
+          "fixed_special_draws_weekly": "fixed_special_draws_weekly",
+          "fixed_special_draws_monthly": "fixed_special_draws_monthly",
+          "special_combo_weekly": "special_combo_weekly",
+          "special_combo_monthly": "special_combo_monthly"
+        },
+        "revenueCatApiKey": "",
+        "verificationBaseUrl": "",
+        "verificationApiKey": "",
+        "termsUrl": "https://titan-tips-privacy-policy.lovable.app/terms",
+        "privacyUrl": "https://titan-tips-privacy-policy.lovable.app/privacy",
+        "supportEmail": "support@titanfootballtips.com",
+        "trustClientWhenUnverified": false
+      }
+    },
+    "owner": "flavianjumbas-organization"
   }
 }

@@ -1,376 +1,268 @@
 import LegalInfoSheet from "@/components/legal-info-sheet";
-import MatchDetailSheet from "@/components/match-detail-sheet";
-import NotificationsSheet from "@/components/notifications-sheet";
+import { MatchDetailModal } from "@/components/match-detail-modal";
+import { AppBottomNav } from "@/components/ui/app-bottom-nav";
+import { AnimatedPressableButton } from "@/components/ui/animated-pressable";
 import { CategoryCard } from "@/components/ui/category-card";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Header } from "@/components/ui/header";
-import { WinningMarquee } from "@/components/ui/winning-marquee";
-import VipPromptSheet from "@/components/vip-prompt-sheet";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import type { FullScreenModalHandle } from "@/components/ui/full-screen-modal";
 import { PremiumColors } from "@/constants/colors";
-import type { Category } from "@/data/mockData";
-import { useFreeTips, useVipTips } from "@/hooks/use-categories";
-import { useMatchesByCategory, useMatchStats } from "@/hooks/use-matches";
-import { useNotifications } from "@/hooks/use-notifications";
-import { useWonPredictions } from "@/hooks/use-won-predictions";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Crown, TrendingUp, Zap } from "lucide-react-native";
-import React, { useCallback, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
-import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
+  FREE_TIP_CATALOG,
+  resolveCatalog,
+  VIP_TIP_CATALOG,
+} from "@/data/category-catalog";
+import type { Category, IconName } from "@/data/mockData";
+import { ENV } from "@/config/env";
+import { useFreeTips, useVipTips } from "@/hooks/use-categories";
+import { useMatchesByCategory } from "@/hooks/use-matches";
+import { useEntitlements } from "@/hooks/use-subscription";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
+import { Crown, Info, Send, ShieldCheck } from "lucide-react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { Image, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+/**
+ * Home-only preview cards. The copy is home-specific, while matches and
+ * entitlement come from the VIP category named by `sourceId`. The VIP page
+ * keeps the catalog titles.
+ */
+const UPCOMING_PREVIEWS: {
+  sourceId: string;
+  title: string;
+  description: string;
+  icon: IconName;
+}[] = [
+  {
+    sourceId: "combo",
+    title: "HT/FT Vault",
+    description: "Half-time and full-time picks",
+    icon: "Trophy",
+  },
+  {
+    sourceId: "combined",
+    title: "Correct Score Vault",
+    description: "Exact scoreline predictions",
+    icon: "Star",
+  },
+];
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-
-  // ── Firestore data ──────────────────────────────────────────────────────────
-  const { categories: freeCategories, loading: freeCatsLoading } =
-    useFreeTips();
-  const { categories: vipCategories, loading: vipCatsLoading } = useVipTips();
-  const { predictions: wonPredictions, loading: wonLoading } =
-    useWonPredictions();
-  const { wonCount, winRate } = useMatchStats();
-  const { notifications, unreadCount, markAllRead } = useNotifications();
-
-  // ── Selected category for the match detail sheet ────────────────────────────
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
-  const { matches: selectedMatches } = useMatchesByCategory(
+  const router = useRouter();
+  const { hasCategory } = useEntitlements();
+  const { categories: freeCategories, loading: freeLoading } = useFreeTips();
+  const { categories: vipCategories, loading: vipLoading } = useVipTips();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const { matches, loading: matchesLoading } = useMatchesByCategory(
     selectedCategory?.id ?? null,
   );
-
-  // ── Bottom sheet refs ───────────────────────────────────────────────────────
-  const matchDetailRef = useRef<BottomSheetModal>(null);
-  const vipPromptRef = useRef<BottomSheetModal>(null);
+  const matchDetailRef = useRef<FullScreenModalHandle>(null);
   const legalInfoRef = useRef<BottomSheetModal>(null);
-  const notificationsRef = useRef<BottomSheetModal>(null);
 
-  const handleCategoryPress = useCallback((category: Category) => {
-    if (category.isVip) {
-      vipPromptRef.current?.present();
-    } else {
-      setSelectedCategory(category);
-      matchDetailRef.current?.present();
-    }
+  const freeTips = useMemo(
+    () =>
+      resolveCatalog(FREE_TIP_CATALOG, freeCategories),
+    [freeCategories],
+  );
+  const upcoming = useMemo(
+    () =>
+      resolveCatalog(
+        UPCOMING_PREVIEWS.map(
+          (preview) =>
+            VIP_TIP_CATALOG.find((category) => category.id === preview.sourceId)!,
+        ),
+        vipCategories,
+      ).map((category, index) => ({
+        ...category,
+        title: UPCOMING_PREVIEWS[index].title,
+        description: UPCOMING_PREVIEWS[index].description,
+        icon: UPCOMING_PREVIEWS[index].icon,
+      })),
+    [vipCategories],
+  );
+
+  const [previewLocked, setPreviewLocked] = useState(false);
+
+  const openCategory = useCallback((category: Category, locked = false) => {
+    setSelectedCategory(category);
+    setPreviewLocked(locked);
+    matchDetailRef.current?.present();
   }, []);
 
-  const handleVipSubscribe = useCallback(() => {
-    vipPromptRef.current?.dismiss();
-  }, []);
-
-  const handleInfoPress = useCallback(() => {
-    legalInfoRef.current?.present();
-  }, []);
-
-  const handleNotificationPress = useCallback(() => {
-    notificationsRef.current?.present();
-    markAllRead();
-  }, [markAllRead]);
+  const goToVip = useCallback(() => {
+    matchDetailRef.current?.dismiss();
+    router.push("/vip");
+  }, [router]);
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      {/* Sticky Header */}
-      <Header
-        onInfoPress={handleInfoPress}
-        onNotificationPress={handleNotificationPress}
-        unreadCount={unreadCount}
-      />
-
+    <View style={styles.screen}>
+      <LoadingOverlay isLoading={freeLoading || vipLoading} />
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + 18, paddingBottom: 28 },
+        ]}
       >
-        {/* Stats Banner */}
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
-          <GlassCard variant="elevated" style={styles.statsBanner}>
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <View style={[styles.statIcon, styles.statIconWon]}>
-                  <TrendingUp size={18} color={PremiumColors.status.won} />
-                </View>
-                <View>
-                  <Text style={styles.statValue}>{winRate}%</Text>
-                  <Text style={styles.statLabel}>Win Rate</Text>
-                </View>
-              </View>
-
-              <View style={styles.statDivider} />
-
-              <View style={styles.statItem}>
-                <View style={[styles.statIcon, styles.statIconAccent]}>
-                  <Zap size={18} color={PremiumColors.accent.primary} />
-                </View>
-                <View>
-                  <Text style={styles.statValue}>{wonCount}</Text>
-                  <Text style={styles.statLabel}>Tips Won</Text>
-                </View>
-              </View>
-
-              <View style={styles.statDivider} />
-
-              <View style={styles.statItem}>
-                <View style={[styles.statIcon, styles.statIconGold]}>
-                  <Crown size={18} color={PremiumColors.gold.primary} />
-                </View>
-                <View>
-                  <Text style={styles.statValue}>VIP</Text>
-                  <Text style={styles.statLabel}>Premium</Text>
-                </View>
-              </View>
+        <View style={styles.topBar}>
+          <View style={styles.brand}>
+            <Image source={require("../../assets/images/icon.png")} style={styles.logo} />
+            <View>
+              <Text style={styles.eyebrow}>MASTER THE</Text>
+              <Text style={styles.brandTitle}>Match!</Text>
             </View>
-          </GlassCard>
+          </View>
+          <View style={styles.actions}>
+            <AnimatedPressableButton
+              onPress={() => legalInfoRef.current?.present()}
+              style={styles.iconButton}
+            >
+              <Info size={19} color={PremiumColors.text.secondary} />
+            </AnimatedPressableButton>
+          </View>
+        </View>
+
+        <Animated.View entering={FadeInDown.delay(80).springify()} style={styles.community}>
+          <View style={styles.communityCopy}>
+            <View style={styles.communityLabel}>
+              <Crown size={13} color={PremiumColors.gold.light} />
+              <Text style={styles.eyebrow}>TELEGRAM COMMUNITY</Text>
+            </View>
+            <Text style={styles.communityTitle}>For more updates</Text>
+          </View>
+          <AnimatedPressableButton
+            accessibilityRole="link"
+            onPress={() => Linking.openURL(ENV.COMMUNITY_URL)}
+            style={styles.communityButton}
+          >
+            <Send size={15} color="#FFFFFF" />
+            <Text style={styles.communityButtonText}>Join Community</Text>
+          </AnimatedPressableButton>
         </Animated.View>
 
-        {/* Free Tips Section */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Zap size={20} color={PremiumColors.accent.primary} />
-              <Text style={styles.sectionTitle}>Free Tips</Text>
-            </View>
-            <Text style={styles.sectionSubtitle}>
-              Daily predictions for everyone
-            </Text>
+        <Animated.View entering={FadeInDown.delay(140).springify()} style={styles.section}>
+          <View style={styles.sectionHeading}>
+            <Text style={styles.sectionTitle}>Free Tips</Text>
+            <Text style={styles.sectionCaption}>Fresh picks, updated daily</Text>
+          </View>
+          <View style={styles.grid}>
+            {freeTips.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                onPress={() => openCategory(category)}
+              />
+            ))}
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInRight.delay(300).springify()}>
-          {freeCatsLoading ? (
-            <ActivityIndicator
-              size="small"
-              color={PremiumColors.accent.primary}
-              style={styles.loader}
-            />
-          ) : (
-            <FlatList
-              data={freeCategories}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.categoryList}
-              renderItem={({ item, index }) => (
-                <Animated.View entering={FadeInRight.delay(300 + index * 100)}>
-                  <CategoryCard
-                    category={item}
-                    onPress={() => handleCategoryPress(item)}
-                  />
-                </Animated.View>
-              )}
-            />
-          )}
-        </Animated.View>
-
-        {/* VIP Tips Section */}
-        <Animated.View entering={FadeInDown.delay(400).springify()}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Crown size={20} color={PremiumColors.gold.primary} />
-              <Text style={[styles.sectionTitle, styles.vipSectionTitle]}>
-                VIP Tips
-              </Text>
-              <View style={styles.vipBadge}>
-                <Text style={styles.vipBadgeText}>PREMIUM</Text>
-              </View>
+        <Animated.View entering={FadeInDown.delay(220).springify()} style={styles.section}>
+          <View style={styles.sectionHeading}>
+            <View style={styles.titleRow}>
+              <Text style={styles.sectionTitle}>Premium Upcoming Predictions</Text>
+              <ShieldCheck size={17} color={PremiumColors.gold.light} />
             </View>
-            <Text style={styles.sectionSubtitle}>
-              Exclusive high-accuracy predictions
-            </Text>
+            <Text style={styles.sectionCaption}>A preview of today&apos;s VIP markets</Text>
+          </View>
+          <View style={styles.grid}>
+            {upcoming.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                locked={!hasCategory(category.id)}
+                hideLockedStatus
+                onPress={() => openCategory(category, !hasCategory(category.id))}
+              />
+            ))}
           </View>
         </Animated.View>
-
-        <Animated.View entering={FadeInRight.delay(500).springify()}>
-          {vipCatsLoading ? (
-            <ActivityIndicator
-              size="small"
-              color={PremiumColors.gold.primary}
-              style={styles.loader}
-            />
-          ) : (
-            <FlatList
-              data={vipCategories}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.categoryList}
-              renderItem={({ item, index }) => (
-                <Animated.View entering={FadeInRight.delay(500 + index * 100)}>
-                  <CategoryCard
-                    category={item}
-                    onPress={() => handleCategoryPress(item)}
-                  />
-                </Animated.View>
-              )}
-            />
-          )}
-        </Animated.View>
-
-        {/* Recently Won Section */}
-        <Animated.View entering={FadeInDown.delay(600).springify()}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <View style={styles.wonIndicator} />
-              <Text style={styles.sectionTitle}>Recently Won</Text>
-              <Crown size={16} color={PremiumColors.gold.primary} />
-            </View>
-            <Text style={styles.sectionSubtitle}>
-              Latest winning predictions · Gold = VIP
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Winning Marquee */}
-        <Animated.View entering={FadeInDown.delay(700).springify()}>
-          {wonLoading ? (
-            <ActivityIndicator
-              size="small"
-              color={PremiumColors.status.won}
-              style={styles.loader}
-            />
-          ) : (
-            <WinningMarquee predictions={wonPredictions} />
-          )}
-        </Animated.View>
-
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      {/* Bottom Sheets */}
-      <MatchDetailSheet
+      <AppBottomNav />
+      <MatchDetailModal
         ref={matchDetailRef}
         category={selectedCategory}
-        matches={selectedMatches}
+        matches={matches}
+        loading={matchesLoading}
+        lockUntilSettled={previewLocked}
+        onUnlock={goToVip}
       />
-
-      <VipPromptSheet ref={vipPromptRef} onSubscribe={handleVipSubscribe} />
-
       <LegalInfoSheet ref={legalInfoRef} />
-
-      <NotificationsSheet
-        ref={notificationsRef}
-        notifications={notifications}
-        onMarkAllRead={markAllRead}
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: PremiumColors.background.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 16,
-  },
-  statsBanner: {
-    marginHorizontal: 16,
-    marginBottom: 24,
-    padding: 16,
-  },
-  statsRow: {
+  screen: { flex: 1, backgroundColor: PremiumColors.background.primary },
+  content: { paddingHorizontal: 18, gap: 28 },
+  topBar: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+  brand: { flexDirection: "row", alignItems: "center", gap: 11 },
+  logo: { width: 44, height: 44, borderRadius: 22 },
+  eyebrow: {
+    color: PremiumColors.text.tertiary,
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.7,
   },
-  statIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  statIconWon: {
-    backgroundColor: PremiumColors.status.wonBackground,
-  },
-  statIconAccent: {
-    backgroundColor: "rgba(59, 130, 246, 0.15)",
-  },
-  statIconGold: {
-    backgroundColor: "rgba(245, 158, 11, 0.15)",
-  },
-  statValue: {
+  brandTitle: {
+    color: PremiumColors.text.primary,
     fontSize: 18,
-    fontWeight: "700",
-    color: PremiumColors.text.primary,
-    fontFamily: "monospace",
+    lineHeight: 20,
+    fontWeight: "800",
   },
-  statLabel: {
-    fontSize: 11,
-    color: PremiumColors.text.tertiary,
-    marginTop: 2,
+  actions: { flexDirection: "row", gap: 8 },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: PremiumColors.glass.background,
+    borderWidth: 1,
+    borderColor: PremiumColors.glass.border,
   },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: PremiumColors.glass.border,
-  },
-  sectionHeader: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  sectionTitleRow: {
+  community: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 4,
+    justifyContent: "space-between",
+    padding: 16,
+    borderRadius: 20,
+    borderCurve: "continuous",
+    backgroundColor: "#17131E",
+    borderWidth: 1,
+    borderColor: PremiumColors.glass.border,
   },
+  communityCopy: { gap: 5, flexShrink: 1 },
+  communityLabel: { flexDirection: "row", alignItems: "center", gap: 5 },
+  communityTitle: { color: PremiumColors.text.primary, fontSize: 15, fontWeight: "700" },
+  communityButton: {
+    height: 42,
+    paddingHorizontal: 15,
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    backgroundColor: "#329DD1",
+  },
+  communityButtonText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
+  section: { gap: 14 },
+  sectionHeading: { gap: 4 },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
     color: PremiumColors.text.primary,
-  },
-  vipSectionTitle: {
-    color: PremiumColors.gold.light,
-  },
-  vipBadge: {
-    backgroundColor: "rgba(245, 158, 11, 0.2)",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginLeft: 4,
-  },
-  vipBadgeText: {
-    fontSize: 9,
+    fontSize: 20,
     fontWeight: "800",
-    color: PremiumColors.gold.primary,
-    letterSpacing: 0.5,
+    letterSpacing: -0.5,
   },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: PremiumColors.text.tertiary,
-  },
-  categoryList: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  wonIndicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: PremiumColors.status.won,
-  },
-  loader: {
-    marginVertical: 24,
-  },
-  bottomSpacer: {
-    height: 40,
-  },
+  sectionCaption: { color: PremiumColors.text.tertiary, fontSize: 12 },
+  grid: { flexDirection: "row", gap: 10 },
 });

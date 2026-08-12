@@ -3,28 +3,119 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Categories — public read, authenticated admin write
+    // ─── Identity ─────────────────────────────────────────────────────────
+    // An account is an admin if it carries the `admin` custom claim, or if it
+    // is listed in /admins. The claim is the fast path — it costs no read and
+    // is what the token already says. The roster document is the bootstrap and
+    // recovery path: a claim only reaches a device after the ID token is
+    // refreshed, so an admin granted access moments ago, or one whose token has
+    // not rotated yet, still writes without waiting or signing out.
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.admin == true
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Markets the apps know about. Retired markets stay on the list so an admin
+    // can still settle or clean up predictions published under them.
+    function isKnownCategory(categoryId) {
+      return categoryId in [
+        'btts',
+        'over25',
+        'combined',
+        'correct',
+        'htft',
+        'vipsingle',
+        'megaodds',
+        'draws',
+        'combo',
+        // Retired
+        '1x2',
+        'daily2'
+      ];
+    }
+
+    function isValidCategoryDocument(docId) {
+      return isKnownCategory(docId)
+        && request.resource.data.title is string
+        && request.resource.data.description is string
+        && request.resource.data.icon is string
+        && request.resource.data.isVip is bool
+        && request.resource.data.isActive is bool
+        && request.resource.data.order is int;
+    }
+
+    function isValidMatchDocument() {
+      return isKnownCategory(request.resource.data.categoryId)
+        && request.resource.data.homeTeam is string
+        && request.resource.data.awayTeam is string
+        && request.resource.data.league is string
+        && request.resource.data.date is string
+        && request.resource.data.prediction is string
+        && (request.resource.data.odds is string
+          || request.resource.data.odds is number)
+        && request.resource.data.status in ['pending', 'won', 'lost'];
+    }
+
+    function isValidTokenDocument() {
+      return request.resource.data.keys().hasOnly([
+          'token', 'platform', 'updatedAt'
+        ])
+        && request.resource.data.token is string
+        && request.resource.data.token.size() >= 20
+        && request.resource.data.token.size() <= 4096
+        && request.resource.data.platform in ['android', 'ios']
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    // ─── Admin roster ─────────────────────────────────────────────────────
+    // Written only by the Admin SDK (scripts/set-admin.js) or the console, so a
+    // signed-in account can never promote itself. An admin may read the roster;
+    // any account may read its own entry, which is how the admin app tells a
+    // real admin apart from a stray login before the first write is attempted.
+    match /admins/{uid} {
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ─── Content ──────────────────────────────────────────────────────────
+    // Everything below is world-readable: the client app ships without auth,
+    // and the whole point of the product is that anyone can see the tips.
+    // Writes are admin-only, and full CRUD — create, update and delete.
+
     match /categories/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update: if isAdmin() && isValidCategoryDocument(docId);
+      allow delete: if isAdmin();
     }
 
-    // Matches — public read, authenticated admin write
     match /matches/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update: if isAdmin() && isValidMatchDocument();
+      allow delete: if isAdmin();
     }
 
-    // Won predictions — public read, authenticated admin write
     match /wonPredictions/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update, delete: if isAdmin();
     }
 
-    // Notifications — public read, authenticated admin write
     match /notifications/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // FCM tokens are write-only to clients. App Check enforcement should also
+    // be enabled in Firebase Console to prevent requests from non-genuine apps.
+    match /fcmTokens/{deviceId} {
+      allow read: if false;
+      allow create, update: if deviceId.matches('^device_[A-Za-z0-9_-]{12,100}$')
+        && isValidTokenDocument();
+      // Device IDs are high-entropy, locally held capabilities. Deletion lets a
+      // device remove its token after notification permission is revoked.
+      allow delete: if deviceId.matches('^device_[A-Za-z0-9_-]{12,100}$');
     }
 
     // Block everything else

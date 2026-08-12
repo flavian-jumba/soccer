@@ -7,7 +7,7 @@ import {
     BottomSheetModal,
 } from "@gorhom/bottom-sheet";
 import type { Timestamp } from "firebase/firestore";
-import { Bell, Clock, Crown, Sparkles, TrendingUp } from "lucide-react-native";
+import { Bell, Clock, Crown, Radio, Sparkles, TrendingUp } from "lucide-react-native";
 import React, { forwardRef, useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -49,6 +49,11 @@ const TYPE_CONFIG = {
     Icon: Crown,
     color: PremiumColors.gold.primary,
     bg: "rgba(245, 158, 11, 0.15)" as string,
+  },
+  broadcast: {
+    Icon: Radio,
+    color: "#A78BFA",
+    bg: "rgba(167, 139, 250, 0.15)" as string,
   },
 } as const;
 
@@ -137,7 +142,7 @@ const NotificationsSheet = forwardRef<
       </View>
       <Text style={styles.emptyTitle}>All caught up</Text>
       <Text style={styles.emptyBody}>
-        We'll notify you here when today's tips are posted.
+        We&apos;ll notify you here when today&apos;s tips are posted.
       </Text>
     </View>
   );

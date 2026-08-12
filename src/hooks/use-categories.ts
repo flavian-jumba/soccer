@@ -28,7 +28,7 @@ function useCategoriesByTier(isVip: boolean) {
           id: doc.id,
           ...(doc.data() as Omit<Category, "id">),
         }));
-        setCategories(data);
+        setCategories(data.filter((category) => category.isActive !== false));
         setLoading(false);
       },
       (err) => {
